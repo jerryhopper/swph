@@ -16,27 +16,9 @@ telegram()
    local VARIABLE=${1}
    apiToken=447794744:AAGrNj3vyDgH5BU_dxQqfDQjgIgeN250Q04
    chatId=-1001402917482
-   RESPONSE=/var/log/cloudflare/response.txt
-   HEADERS=/var/log/cloudflare/headers.txt
-   status=$(curl https://api.ipify.org -s -w %{http_code} $1 -o $RESPONSE)
-   if [ $status -ne 200 ];then
-     printf "\n$(date) : Error from ipify.\n"
-           curl -s -X POST https://api.telegram.org/bot$apiToken/sendMessage \
-           -d text="$(date) : Error from ipify" \
-           -d chat_id=$chatId
-     exit 1
-   fi
-   hourstamp=$(date +"%F-%H")
-   past_ip=$(cat /var/log/cloudflare/ip.log)
-   publicip=$(cat /var/log/cloudflare/response.txt)
-   hourstamp=$(date +"%F-%H")
-   past_ip=$(cat /var/log/cloudflare/ip.log)
-   publicip=$(cat /var/log/cloudflare/response.txt)
-   if [ $past_ip = $publicip ]; then
-       printf "\n$(date) : IP Address not changed.\n"
-       exit 1
-   fi
+   curl -s -X POST https://api.telegram.org/bot$apiToken/sendMessage -d text="create_image : $VARIABLE" -d chat_id=$chatId >/dev/null
 }
+
 
 telegram "Automation_Custom_Script.sh"
 
