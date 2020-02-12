@@ -7,7 +7,7 @@ set -e
 telegram()
 {
    local VARIABLE=${1}
-   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="create_image : $VARIABLE" >/dev/null
+   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="2_registerhardware.sh: $VARIABLE" >/dev/null
 }
 telegram() "Check"
 
