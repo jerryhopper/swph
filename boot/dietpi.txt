@@ -113,7 +113,7 @@ AUTO_SETUP_INSTALL_SOFTWARE_ID=93
 #------------------------------------------------------------------------------------------------------
 # DietPi-Survey: 1=opt in | 0=opt out | -1=ask on first call
 # - https://dietpi.com/phpbb/viewtopic.php?p=34#p34
-SURVEY_OPTED_IN=-1
+SURVEY_OPTED_IN=0
 
 #------------------------------------------------------------------------------------------------------
 # D I E T - P I
@@ -172,7 +172,7 @@ CONFIG_NTP_MODE=2
 CONFIG_WIFI_COUNTRY_CODE=GB
 
 # Serial Console: Set to 0 if you do not require serial console.
-CONFIG_SERIAL_CONSOLE_ENABLE=1
+CONFIG_SERIAL_CONSOLE_ENABLE=0
 
 # Soundcard
 CONFIG_SOUNDCARD=none
