@@ -17,7 +17,27 @@ telegram()
    curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="Automation_Custom_Script.sh: $VARIABLE" >/dev/null
 }
 
-telegram "Check"
+FILE=/boot/blackbox/hardware.json
+if [ -f "$FILE" ]; then
+   HW=$FILE
+   #telegram "EXISTS: $FILE"
+fi
+
+FILE=/boot/blackbox/hardware.hash
+if [ -f "$FILE" ]; then
+   HWH=$FILE
+   #telegram "EXISTS: $FILE"
+fi
+
+FILE=/var/log/sinit.log
+if [ -f "$FILE" ]; then
+   SINI=$FILE
+   telegram "EXISTS: $FILE"
+fi
+
+
+telegram "$HW,$HWH,$SINI"
+
 
 
 
