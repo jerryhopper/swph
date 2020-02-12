@@ -16,11 +16,11 @@ telegram()
    local VARIABLE=${1}
    apiToken=447794744:AAGrNj3vyDgH5BU_dxQqfDQjgIgeN250Q04
    chatId=-1001402917482
-   curl -s -X POST https://api.telegram.org/bot$apiToken/sendMessage -d text="create_image : $VARIABLE" -d chat_id=$chatId >/dev/null
+   curl -s -X POST https://api.telegram.org/bot$apiToken/sendMessage -d text="Automation_Custom_Script.sh : $VARIABLE" -d chat_id=$chatId >/dev/null
 }
+telegram() "Check"
 
 
-telegram "Automation_Custom_Script.sh"
 
 
 
