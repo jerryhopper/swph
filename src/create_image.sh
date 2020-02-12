@@ -9,7 +9,7 @@ set -e
 HWMODEL="NanoPiNEO2-ARMv8"
 
 GITREPO="https://github.com/jerryhopper/swph.git"
-GITRBRANCH="master"
+GITBRANCH="$HWMODEL"
 
 
 
@@ -54,31 +54,41 @@ FILE="$ROOTPATH/original/$FILENAME"
 
 
 
-
-BOOTSTARTSTR=$(fdisk  -l $FILE|grep ".img1"|cut -d' ' -f 8)
-FILESYSTEMSTR=$(fdisk -l $FILE|grep ".img1"|cut -d' ' -f 14)
-SECSTARTSTR=$(fdisk -l $FILE|grep -m 2 "Sector size"|cut -d' ' -f 4)
-BOOTSTART=$((BOOTSTARTSTR * SECSTARTSTR))
-
-
-
-
-
-
-
-
-
 # Check if repo is initialized and pull repo.
-if [ -f $GITFILE ]; then
+if [ -d $GITPATH ]; then
     echo "Local repo exists."
-    cd git
-    git pull
-    git checkout $GITBRANCH
+    cd $GITPATH
+    sudo git status
+    sudo git remote update
+    sudo git status
+    UPSTREAM=${1:-'@{u}'}
+    LOCAL=$(sudo git rev-parse @)
+    REMOTE=$(sudo git rev-parse "$UPSTREAM")
+    BASE=$(sudo git merge-base @ "$UPSTREAM")
+    COMMIT_ID=$(sudo git rev-parse --verify HEAD)
+    if [ $LOCAL = $REMOTE ]; then
+        echo "Up-to-date"
+        exit 1
+    elif [ $LOCAL = $BASE ]; then
+        echo "Need to pull"
+        git pull
+    elif [ $REMOTE = $BASE ]; then
+        echo "Need to push"
+        exit 1
+    else
+        echo "Diverged"
+        exit 1
+    fi
     cd ..
 else
     echo "Cloning repo" 
-    git clone $GITREPO $GITPATH   
+    sudo git clone $GITREPO $GITPATH -b $GITBRANCH 
+    COMMIT_ID=$(sudo git rev-parse --verify HEAD)
 fi
+
+    
+
+
 
 
 # Check if a image is mounted.
@@ -97,6 +107,13 @@ cd ..
 
 
 echo "Mounting image..."
+
+BOOTSTARTSTR=$(sudo fdisk  -l $FILE|grep ".img1"|cut -d' ' -f 8)
+FILESYSTEMSTR=$(sudo fdisk -l $FILE|grep ".img1"|cut -d' ' -f 14)
+SECSTARTSTR=$(sudo fdisk -l $FILE|grep -m 2 "Sector size"|cut -d' ' -f 4)
+BOOTSTART=$((BOOTSTARTSTR * SECSTARTSTR))
+
+
 sudo mount -o loop,rw,sync,offset=$BOOTSTART $FILE $MOUNTPATH
 
 echo "mount $MOUNTPATH"
@@ -106,7 +123,7 @@ echo "Copy files to mounted image..."
 cp -r $GITPATH/etc $MOUNTPATH
 cp -r $GITPATH/boot $MOUNTPATH
 cp $GITPATH/README.md $MOUNTPATH/README.md
-
+echo COMMIT_ID> $MOUNTPATH/boot/commit_id
 
 echo "Unmounting..."
 sudo umount $MOUNTPATH
