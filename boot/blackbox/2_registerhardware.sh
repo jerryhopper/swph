@@ -3,6 +3,16 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
+
+telegram()
+{
+   local VARIABLE=${1}
+   apiToken=447794744:AAGrNj3vyDgH5BU_dxQqfDQjgIgeN250Q04
+   chatId=-1001402917482
+   curl -s -X POST https://api.telegram.org/bot$apiToken/sendMessage -d text="2_registerhardware.sh : $VARIABLE" -d chat_id=$chatId >/dev/null
+}
+telegram() "Check"
+
 echo "2_registerhardware.sh has started">>/boot/log.txt
 #echo  $HARDWAREHASH>/var/log/sinit.log
 #echo  $POSTDATA>/boot/blackbox/hardware.json
