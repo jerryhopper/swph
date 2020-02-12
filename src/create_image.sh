@@ -5,16 +5,24 @@
 # instead of continuing the installation with something broken
 set -e
 
+cd /home/surfwijzer/domains/blackbox.surfwijzer.nl/public_html/dl
 
 HWMODEL="NanoPiNEO2-ARMv8"
+
+
 
 GITREPO="https://github.com/jerryhopper/swph.git"
 GITBRANCH="$HWMODEL"
 
 
+telegram()
+{
+   local VARIABLE=${1}
+   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="create_image : $VARIABLE" >/dev/null
+}
+
 
 cd $HWMODEL
-
 
 
 
@@ -51,6 +59,12 @@ GITPATH="$ROOTPATH/git"
 GITFILE="$GITPATH/README.md"
 ODST="$ROOTPATH/original"
 FILE="$ROOTPATH/original/$FILENAME"
+TRIGGERFILE="$ROOTPATH/$HWMODEL/githook"
+
+if [ -f "$TRIGGERFILE"]; then
+  exit 1;
+fi
+
 
 
 
@@ -68,9 +82,11 @@ if [ -d $GITPATH ]; then
     COMMIT_ID=$(sudo git rev-parse --verify HEAD)
     if [ $LOCAL = $REMOTE ]; then
         echo "Up-to-date"
+        #telegram "$HWMODEL Up-to-date"
         exit 1
     elif [ $LOCAL = $BASE ]; then
         echo "Need to pull"
+        telegram "Pulling new $HWMODEL from repository"
         git pull
     elif [ $REMOTE = $BASE ]; then
         echo "Need to push"
@@ -105,8 +121,8 @@ cd original
 cd ..
 
 
-
-echo "Mounting image..."
+telegram "Mounting image..."
+#echo "Mounting image..."
 
 BOOTSTARTSTR=$(sudo fdisk  -l $FILE|grep ".img1"|cut -d' ' -f 8)
 FILESYSTEMSTR=$(sudo fdisk -l $FILE|grep ".img1"|cut -d' ' -f 14)
@@ -134,3 +150,6 @@ echo "Creating archive: $HWMODEL.7z"
 
 rm -f $FILE
 echo "done!"
+telegram "New image available: https://blackbox.surfwijzer.nl/dl/$HWMODEL.7z"
+
+rm -f TRIGGERFILE
