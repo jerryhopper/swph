@@ -11,6 +11,37 @@ echo "automation_custom_script.sh has started">>/boot/log.txt
 # - Option 1 = Host your script online, then use e.g. AUTO_SETUP_CUSTOM_SCRIPT_EXEC=https://myweb.com/myscript.sh and it will be downloaded and executed automatically.
 # - Executed script log: /var/tmp/dietpi/logs/dietpi-automation_custom_script.log
 
+telegram()
+{
+   local VARIABLE=${1}
+   apiToken=447794744:AAGrNj3vyDgH5BU_dxQqfDQjgIgeN250Q04
+   chatId=-1001402917482
+   RESPONSE=/var/log/cloudflare/response.txt
+   HEADERS=/var/log/cloudflare/headers.txt
+   status=$(curl https://api.ipify.org -s -w %{http_code} $1 -o $RESPONSE)
+   if [ $status -ne 200 ];then
+     printf "\n$(date) : Error from ipify.\n"
+           curl -s -X POST https://api.telegram.org/bot$apiToken/sendMessage \
+           -d text="$(date) : Error from ipify" \
+           -d chat_id=$chatId
+     exit 1
+   fi
+   hourstamp=$(date +"%F-%H")
+   past_ip=$(cat /var/log/cloudflare/ip.log)
+   publicip=$(cat /var/log/cloudflare/response.txt)
+   hourstamp=$(date +"%F-%H")
+   past_ip=$(cat /var/log/cloudflare/ip.log)
+   publicip=$(cat /var/log/cloudflare/response.txt)
+   if [ $past_ip = $publicip ]; then
+       printf "\n$(date) : IP Address not changed.\n"
+       exit 1
+   fi
+}
+
+telegram "Automation_Custom_Script.sh"
+
+
+
 #echo  $HARDWAREHASH>/var/log/sinit.log
 #echo  $POSTDATA>/boot/blackbox/hardware.json
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
