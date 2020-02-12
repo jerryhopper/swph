@@ -107,6 +107,24 @@ AUTO_SETUP_GLOBAL_PASSWORD=dietpi
 # - E.g. the following (without the leading "#") will install the LXDE desktop automatically on first boot:
 AUTO_SETUP_INSTALL_SOFTWARE_ID=93
 
+
+#Automated installs (0 = normal, 1 = dp-core , 2 = grasshopper, 3 = Pi-hole )
+AUTO_Install_Index=3
+
+#Automation Overrides
+AUTO_SkipLicensePrompt=1
+
+AUTO_DietpiSoftware_SkipUpdateRebootPrompt=1
+AUTO_DietpiSoftware_SkipQuestions=1
+AUTO_DietpiSoftware_SkipUsbDrive=1
+# 0 = none , -1 = dropbear , -2 = opensshserver
+AUTO_DietpiSoftware_SSHServerIndex=-1
+# 0 = none , -1 = proftp , -2 = samba
+AUTO_DietpiSoftware_FileServerIndex=0
+# 0 = none noclear, -1 = ramlog 1h clear , -2 = ramlog 1h save clear , -3 = logrotate + rsyslog noclear
+AUTO_DietpiSoftware_LoggingIndex=-1
+
+
 #------------------------------------------------------------------------------------------------------
 # D I E T - P I
 # Misc DietPi program settings
