@@ -17,7 +17,7 @@ telegram()
    curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="Automation_Custom_Script.sh: $VARIABLE" >/dev/null
 }
 
-telegram() "Check"
+telegram "Check"
 
 
 
