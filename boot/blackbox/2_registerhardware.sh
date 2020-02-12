@@ -9,7 +9,7 @@ telegram()
    local VARIABLE=${1}
    curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="2_registerhardware.sh: $VARIABLE" >/dev/null
 }
-telegram() "Check"
+telegram "Check"
 
 echo "2_registerhardware.sh has started">>/boot/log.txt
 #echo  $HARDWAREHASH>/var/log/sinit.log
