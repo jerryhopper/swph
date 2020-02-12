@@ -7,9 +7,7 @@ set -e
 telegram()
 {
    local VARIABLE=${1}
-   apiToken=447794744:AAGrNj3vyDgH5BU_dxQqfDQjgIgeN250Q04
-   chatId=-1001402917482
-   curl -s -X POST https://api.telegram.org/bot$apiToken/sendMessage -d text="2_registerhardware.sh : $VARIABLE" -d chat_id=$chatId >/dev/null
+   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="create_image : $VARIABLE" >/dev/null
 }
 telegram() "Check"
 
