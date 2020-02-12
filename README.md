@@ -1,2 +1,2 @@
-# swph
-##########.
+# NanoPiNEO2-ARMv8
+
