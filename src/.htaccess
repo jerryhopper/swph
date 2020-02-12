@@ -1,0 +1,4 @@
+RewriteEngine on
+
+RewriteRule ^NanoPiNEO2.7z NanoPiNEO2-ARMv8/NanoPiNEO2-ARMv8.7z
+RewriteRule ^NanoPiZeroPi.7z NanoPiNEO2-ARMv8/NanoPiZeroPi-ARMv7.7z
