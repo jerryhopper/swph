@@ -39,6 +39,7 @@
 			if ip r s 0.0.0.0/0 &> /dev/null; then
 
 				G_DIETPI-NOTIFY 0 "$(date) | Valid network connection found"
+				bash /DietPi/dietpi/netup
 				break
 
 			elif (( $loop_count >= $max_loops )); then
@@ -89,7 +90,7 @@
 		# Lower dmesg print level (mostly for Odroid C2 where HiFi Shield prints info when starting/stopping stream on tty1)
 		dmesg -n 1
 		#----------------------------------------------------------------
-    bash /dietpi/netup
+
 	}
 
 	#/////////////////////////////////////////////////////////////////////////////////////
