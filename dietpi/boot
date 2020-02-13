@@ -39,7 +39,6 @@
 			if ip r s 0.0.0.0/0 &> /dev/null; then
 
 				G_DIETPI-NOTIFY 0 "$(date) | Valid network connection found"
-				bash /DietPi/dietpi/netup
 				break
 
 			elif (( $loop_count >= $max_loops )); then
@@ -123,6 +122,8 @@
 	# Normal boot
 	# - Run time sync
 	(( $G_DIETPI_INSTALL_STAGE == 2 )) && /DietPi/dietpi/func/run_ntpd 1 &
+	#-----------------------------------------------------------------------------------
+	/DietPi/dietpi/netup
 	#-----------------------------------------------------------------------------------
 	exit
 	#-----------------------------------------------------------------------------------
