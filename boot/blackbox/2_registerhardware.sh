@@ -5,7 +5,9 @@
 set -e
 
 echo "2_registerhardware.sh has started">>/boot/log.txt
-
+start(){
+  sendhash
+}
 telegram()
 {
    local VARIABLE=${1}
@@ -54,3 +56,4 @@ sendhash()
 
 # check if network is available (assumed yes)
 
+start
