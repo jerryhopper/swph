@@ -30,6 +30,7 @@ CPR=$(cat /proc/cpuinfo |grep -m 1 "CPU revision"|cut -d' ' -f 3)
 DTE=$(date)
 
 
+
 generate_post_data()
 {
   cat <<EOF
