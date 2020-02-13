@@ -14,7 +14,7 @@ FILE=/boot/blackbox/1_hardwaredetect.sh
 if [ -f "$FILE" ]; then
     # the file exists!
     # run hardware detection and create hardware.json & hardware.hash
-    echo "$FILE exist"
+    #echo "$FILE exist"
     bash /boot/blackbox/1_hardwaredetect.sh
     # after the hardwaretest, remove the script.
     rm -f /boot/blackbox/1_hardwaredetect.sh
