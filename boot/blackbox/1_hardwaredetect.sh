@@ -44,4 +44,5 @@ echo  $POSTDATA>/boot/blackbox/hardware.json
 echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
 #sudo echo  $HARDWAREHASH>/var/log/sinit.log
 
+
 echo "1_hardwaredetect.sh has started">>/boot/log.txt
