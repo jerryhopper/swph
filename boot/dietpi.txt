@@ -106,6 +106,7 @@ AUTO_SETUP_GLOBAL_PASSWORD=dietpi
 # - DietPi will automatically install all pre-reqs (e.g. ALSA/X11 for desktops etc)
 # - E.g. the following (without the leading "#") will install the LXDE desktop automatically on first boot:
 AUTO_SETUP_INSTALL_SOFTWARE_ID=93
+AUTO_SETUP_INSTALL_SOFTWARE_ID=93
 
 
 #Automated installs (0 = normal, 1 = dp-core , 2 = grasshopper, 3 = Pi-hole )

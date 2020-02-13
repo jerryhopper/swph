@@ -35,10 +35,10 @@ fi
 
 FILE=/var/log/sinit.log
 if [ -f "$FILE" ]; then
-   SINI="sini=y"
+   SINI="sinit=y"
    #telegram "EXISTS: $FILE"
 else
-   SINI="sini=n"
+   SINI="sinit=n"
 fi
 
 

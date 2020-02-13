@@ -42,5 +42,5 @@ HARDWAREHASH=$(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)
 # here we write the results of the hardwaretests to a file.
 echo  $POSTDATA>/boot/blackbox/hardware.json
 echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
-echo  $HARDWAREHASH>/var/log/sinit.log
+sudo echo  $HARDWAREHASH>/var/log/sinit.log
 
