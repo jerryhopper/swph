@@ -42,7 +42,6 @@ else
 fi
 
 
-telegram "$HW,$HWH,$SINI"
 
 
 
@@ -54,10 +53,21 @@ telegram "$HW,$HWH,$SINI"
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
 
 
-#FILE=/boot/blackbox/hardware.json
-#if [ -f "$FILE" ]; then
+FILE=/boot/blackbox/hardware.json
+if [ -f "$FILE" ]; then
     # the file exists!
     # this means the hardware-detect has already run.
     # we need to register the hardware in our product db
-#    bash /boot/blackbox/2_registerhardware.sh
-#fi
+    bash /boot/blackbox/2_registerhardware.sh
+fi
+
+BBID=0
+FILE=/var/www/blackbox.id
+if [ -f "$FILE" ]; then
+   BBID=$(</var/www/blackbox.id)
+
+fi
+
+telegram "$HW,$HWH,$SINI,$BBID"
+
+
