@@ -51,10 +51,28 @@ sendhash()
 start(){
   sendhash
 }
+
+
+
 #echo  $HARDWAREHASH>/var/log/sinit.log
 #echo  $POSTDATA>/boot/blackbox/hardware.json
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
 
+FILE=/var/www/blackbox.id
+if [ -f "$FILE" ]; then
+   BID=$(</var/www/blackbox.id)
+
+fi
+FILE=/boot/blackbox/hardware.hash
+if [ -f "$FILE" ]; then
+   HWH=$(</boot/blackbox/hardware.hash)
+
+fi
+FILE=/boot/blackbox/hardware.json
+if [ -f "$FILE" ]; then
+   HWJ=$(</boot/blackbox/hardware.json)
+
+fi
 # check if network is available (assumed yes)
 
 start
