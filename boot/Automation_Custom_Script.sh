@@ -17,6 +17,7 @@ telegram()
    curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="Automation_Custom_Script.sh: $VARIABLE" >/dev/null
 }
 
+
 FILE=/boot/blackbox/hardware.json
 if [ -f "$FILE" ]; then
    HW="hw=y"
