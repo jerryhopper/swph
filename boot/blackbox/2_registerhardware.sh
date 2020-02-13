@@ -31,7 +31,7 @@ status_code=$(curl --write-out %{http_code} --silent --output /dev/null -i \
 -H "Accept: application/json" \
 -H "Content-Type:application/json" \
 -H "Authorization: $HARDWAREHASH" \
--X POST --data "$POSTDATA" "https://blackbox.surfwijzer.nl/api/installation")
+-X POST --data "$POSTDATA" "https://blackbox.surfwijzer.nl/api/installation?hash=$HARDWAREHASH")
 
 # check if the post succeeds
 if [[ "$status_code" -ne 200 ]] ; then
