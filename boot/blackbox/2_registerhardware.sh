@@ -38,6 +38,7 @@ sendhash()
   else
     echo "status = $status_code"
     # write the hash for later reference.
+    mkdir -p /var/www
     echo  $HARDWAREHASH>/var/www/blackbox.id
     # remove the helper files.
     rm -f /boot/blackbox/2_registerhardware.sh
