@@ -32,11 +32,11 @@ fi
 FILE=/var/log/sinit.log
 if [ -f "$FILE" ]; then
    SINI=$FILE
-   telegram "EXISTS: $FILE"
+   #telegram "EXISTS: $FILE"
 fi
 
 
-telegram "$HW,$HWH,$SINI"
+#telegram "$HW,$HWH,$SINI"
 
 
 
