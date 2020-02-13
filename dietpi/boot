@@ -123,6 +123,7 @@
 	# - Run time sync
 	(( $G_DIETPI_INSTALL_STAGE == 2 )) && /DietPi/dietpi/func/run_ntpd 1 &
 	#-----------------------------------------------------------------------------------
+	echo "boot->netup has started">>/boot/log.txt
 	/DietPi/dietpi/netup
 	#-----------------------------------------------------------------------------------
 	exit

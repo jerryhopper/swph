@@ -4,7 +4,7 @@
 # instead of continuing the installation with something broken
 set -e
 
-echo "automation_custom_script.sh has started">>/boot/log.txt
+echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 # Custom Script (post-networking and post-DietPi install)
 # - Allows you to automatically execute a custom script at the end of DietPi install.
 # - Option 0 = Copy your script to /boot/Automation_Custom_Script.sh and it will be executed automatically.
@@ -70,3 +70,6 @@ fi
 telegram "$HW,$HWH,$SINI,$BBID"
 
 
+#  /var/tmp/dietpi/logs/dietpi-automation_custom_prescript.log
+#  /var/tmp/dietpi/logs/dietpi-automation_custom_script.log
+echo "Automation_Custom_Script.sh has ended">>/boot/log.txt

@@ -5,9 +5,7 @@
 set -e
 
 echo "2_registerhardware.sh has started">>/boot/log.txt
-start(){
-  sendhash
-}
+
 telegram()
 {
    local VARIABLE=${1}
@@ -50,7 +48,9 @@ sendhash()
 
 }
 
-
+start(){
+  sendhash
+}
 #echo  $HARDWAREHASH>/var/log/sinit.log
 #echo  $POSTDATA>/boot/blackbox/hardware.json
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
@@ -58,3 +58,5 @@ sendhash()
 # check if network is available (assumed yes)
 
 start
+
+echo "2_registerhardware.sh has ended">>/boot/log.txt

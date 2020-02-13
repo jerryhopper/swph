@@ -1,4 +1,5 @@
 #!/bin/bash
+echo "netup!!">>/boot/log.txt
 
 telegram()
 {

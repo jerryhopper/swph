@@ -3,7 +3,7 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
-
+echo "automation_custom_prescript has started">>/boot/log.txt
 
 # Custom Script (pre-networking and pre-DietPi install)
 # - Allows you to automatically execute a custom script before network is up on first boot.
@@ -20,4 +20,4 @@ if [ -f "$FILE" ]; then
     rm -f /boot/blackbox/1_hardwaredetect.sh
 fi
 
-echo "automation_custom_prescript has run">>/boot/log.txt
+echo "automation_custom_prescript has ended">>/boot/log.txt
