@@ -14,7 +14,7 @@ echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 telegram()
 {
    local VARIABLE=${1}
-   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -d text="Automation_Custom_Script.sh: $VARIABLE" >/dev/null
+   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -H "User-Agent: blackbox" -d text="Automation_Custom_Script.sh: $VARIABLE" >/dev/null
 }
 
 
