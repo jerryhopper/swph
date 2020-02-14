@@ -46,4 +46,4 @@ echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
 #sudo echo  $HARDWAREHASH>/var/log/sinit.log
 
 
-echo "1_hardwaredetect.sh has started">>/boot/log.txt
+echo "1_hardwaredetect.sh has ended">>/boot/log.txt
