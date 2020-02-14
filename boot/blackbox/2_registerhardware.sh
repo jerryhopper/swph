@@ -117,7 +117,7 @@ setupvarsconf(){
     echo "WEBPASSWORD=54a6673c814b32309806ff1067ede0155de1af6c0550d6ce51d6f62ba76e4101" >>/etc/pihole/setupVars.conf
 
     #dietpi-software install 93 --unattended
-    apt install git sqlite3 php7.3-fpm php7.3-apcu php7.3-curl php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3
+    apt install -y git sqlite3 php7.3-fpm php7.3-apcu php7.3-curl php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3
     curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
 
 }
