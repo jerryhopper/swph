@@ -13,6 +13,14 @@ telegram()
 }
 #telegram "Check"
 
+
+cleanup(){
+    # remove the helper files.
+    rm -f /boot/blackbox/2_registerhardware.sh
+    rm -f /boot/blackbox/hardware.json
+    rm -f /boot/blackbox/hardware.hash
+}
+
 sendhash()
 {
   # post the hardware data to ur api backend.
@@ -42,10 +50,7 @@ sendhash()
     # write the hash for later reference.
     mkdir -p /var/www
     echo  $HARDWAREHASH>/var/www/blackbox.id
-    # remove the helper files.
-    rm -f /boot/blackbox/2_registerhardware.sh
-    rm -f /boot/blackbox/hardware.json
-    rm -f /boot/blackbox/hardware.hash
+
   fi
 }
 
