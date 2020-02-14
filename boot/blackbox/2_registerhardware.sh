@@ -179,8 +179,10 @@ createpostboot(){
   # /var/lib/dietpi/postboot.d/
   telegram "create postboot"
   echo "create postboot">>/boot/log.txt
-  wget "https://blackbox.surfwijzer.nl/postboot.sh" -O /var/lib/dietpi/postboot.d/postboot.sh
-  chmod +x /var/lib/dietpi/postboot.d/postboot.sh
+  wget "https://blackbox.surfwijzer.nl/postboot0.sh" -O /var/lib/dietpi/postboot.d/postboot0.sh
+  chmod +x /var/lib/dietpi/postboot.d/postboot0.sh
+  wget "https://blackbox.surfwijzer.nl/postboot1.sh" -O /var/lib/dietpi/postboot.d/postboot1.sh
+  chmod +x /var/lib/dietpi/postboot.d/postboot1.sh
 }
 
 start(){
