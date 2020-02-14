@@ -161,9 +161,16 @@ aptinstall(){
   telegram "apt install finished : sqlite3"
   echo "install finished : php etc">>/boot/log.txt
 
+  echo "install started : others">>/boot/log.txt
+  apt install -y dnsutils lsof netcat idn2 dns-root-data
+  telegram "apt install finished : others"
+  echo "install finished : php etc">>/boot/log.txt
+
+
+
   echo "install started : php etc">>/boot/log.txt
   apt install -y php7.3-fpm php7.3-apcu php7.3-curl php7.3-cgi php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3
-  telegram "apt install finished : php etc,  Continueing with piholeinstall"
+  telegram "apt install finished : php etc"
   echo "install finished : php etc">>/boot/log.txt
 }
 
@@ -183,7 +190,7 @@ start(){
   piholeftlconf
   createpostboot
   aptinstall
-  piholeinstall
+  #piholeinstall
 }
 
 
