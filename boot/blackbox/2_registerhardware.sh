@@ -31,10 +31,12 @@ sendhash()
   # check if the post succeeds
   if [[ "$status_code" -ne 200 ]] ; then
     # unsuccessful attempt.
-    echo "Site status changed to $status_code"
-    echo "ERRORRRR do not activate."
+    telegram "sendhash Error : Status = $status_code"
+    #echo "Site status changed to $status_code"
+    #echo "ERRORRRR do not activate."
   else
     echo "status = $status_code"
+    telegram "sendhash ok : device registered ( $IPV4_ADDRESS )"
     # write the hash for later reference.
     mkdir -p /var/www
     echo  $HARDWAREHASH>/var/www/blackbox.id
@@ -108,7 +110,7 @@ setupvarsconf(){
     mkdir -p /etc/pihole
     echo "PIHOLE_INTERFACE=eth0" >/etc/pihole/setupVars.conf
     #echo "IPV4_ADDRESS=10.0.1.207/24" >>/etc/pihole/setupVars.conf
-    echo "IPV4_ADDRESS=" >>/etc/pihole/setupVars.conf
+    echo "IPV4_ADDRESS=$IPV4_ADDRESS" >>/etc/pihole/setupVars.conf
     echo "IPV6_ADDRESS=" >>/etc/pihole/setupVars.conf
     echo "PIHOLE_DNS_1=8.8.8.8" >>/etc/pihole/setupVars.conf
     echo "PIHOLE_DNS_2=8.8.4.4" >>/etc/pihole/setupVars.conf
@@ -117,16 +119,22 @@ setupvarsconf(){
     echo "INSTALL_WEB_INTERFACE=true" >>/etc/pihole/setupVars.conf
     echo "LIGHTTPD_ENABLED=false" >>/etc/pihole/setupVars.conf
     echo "BLOCKING_ENABLED=true" >>/etc/pihole/setupVars.conf
-    echo "WEBPASSWORD=54a6673c814b32309806ff1067ede0155de1af6c0550d6ce51d6f62ba76e4101" >>/etc/pihole/setupVars.conf
+    echo "WEBPASSWORD=84ea6bece4df810e8a3d53ba0e6c5ff9cdc5c25ddd2d8b6ad5c5e009015c3e54" >>/etc/pihole/setupVars.conf
 
 }
 
 piholeinstall(){
-  curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
+    curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
+    telegram "install finished : pihole"
 }
 
 aptinstall(){
-    apt install -y git sqlite3 php7.3-fpm php7.3-apcu php7.3-curl php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3
+  apt install -y git
+  telegram "apt install finished : git"
+  apt install -y sqlite3
+  telegram "apt install finished : sqlite3"
+  apt install -y php7.3-fpm php7.3-apcu php7.3-curl php7.3-cgi php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3
+  telegram "apt install finished : php etc,  Continueing with piholeinstall"
 }
 
 start(){
@@ -134,6 +142,8 @@ start(){
   sendhash
   setupvarsconf
   aptinstall
+  piholeinstall
+
 }
 
 
