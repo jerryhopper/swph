@@ -101,6 +101,25 @@ find_IPv4_information() {
 }
 
 
+setupvarsconf(){
+    mkdir -p /etc/pihole
+    echo "PIHOLE_INTERFACE=eth0" >/etc/pihole/setupVars.conf
+    #echo "IPV4_ADDRESS=10.0.1.207/24" >>/etc/pihole/setupVars.conf
+    echo "IPV4_ADDRESS=" >>/etc/pihole/setupVars.conf
+    echo "IPV6_ADDRESS=" >>/etc/pihole/setupVars.conf
+    echo "PIHOLE_DNS_1=8.8.8.8" >>/etc/pihole/setupVars.conf
+    echo "PIHOLE_DNS_2=8.8.4.4" >>/etc/pihole/setupVars.conf
+    echo "QUERY_LOGGING=false" >>/etc/pihole/setupVars.conf
+    echo "INSTALL_WEB_SERVER=false" >>/etc/pihole/setupVars.conf
+    echo "INSTALL_WEB_INTERFACE=true" >>/etc/pihole/setupVars.conf
+    echo "LIGHTTPD_ENABLED=false" >>/etc/pihole/setupVars.conf
+    echo "BLOCKING_ENABLED=true" >>/etc/pihole/setupVars.conf
+    echo "WEBPASSWORD=54a6673c814b32309806ff1067ede0155de1af6c0550d6ce51d6f62ba76e4101" >>/etc/pihole/setupVars.conf
+
+    dietpi-software install 93 --unattended
+
+}
+
 
 start(){
   find_IPv4_information
@@ -133,3 +152,7 @@ fi
 start
 
 echo "2_registerhardware.sh has ended">>/boot/log.txt
+
+
+
+
