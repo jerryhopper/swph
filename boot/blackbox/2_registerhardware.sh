@@ -124,6 +124,7 @@ setupvarsconf(){
 start(){
   find_IPv4_information
   sendhash
+  setupvarsconf
 }
 
 
