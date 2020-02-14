@@ -32,11 +32,13 @@ sendhash()
   if [[ "$status_code" -ne 200 ]] ; then
     # unsuccessful attempt.
     telegram "sendhash Error : Status = $status_code"
+    echo "sendhash Error : Status = $status_code">>/boot/log.txt
     #echo "Site status changed to $status_code"
     #echo "ERRORRRR do not activate."
   else
     echo "status = $status_code"
     telegram "sendhash ok : device registered ( $IPV4_ADDRESS )"
+    echo "sendhash ok : device registered ( $IPV4_ADDRESS )">>/boot/log.txt
     # write the hash for later reference.
     mkdir -p /var/www
     echo  $HARDWAREHASH>/var/www/blackbox.id
@@ -124,17 +126,27 @@ setupvarsconf(){
 }
 
 piholeinstall(){
+    echo "install started : pihole">>/boot/log.txt
     curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
     telegram "install finished : pihole"
+    echo "install finished : pihole">>/boot/log.txt
 }
 
 aptinstall(){
+  echo "install started : git">>/boot/log.txt
   apt install -y git
   telegram "apt install finished : git"
+  echo "install finished : git">>/boot/log.txt
+
+  echo "install started : sqlite3">>/boot/log.txt
   apt install -y sqlite3
   telegram "apt install finished : sqlite3"
+  echo "install finished : php etc">>/boot/log.txt
+
+  echo "install started : php etc">>/boot/log.txt
   apt install -y php7.3-fpm php7.3-apcu php7.3-curl php7.3-cgi php7.3-gd php7.3-mbstring php7.3-xml php7.3-zip php7.3-sqlite3
   telegram "apt install finished : php etc,  Continueing with piholeinstall"
+  echo "install finished : php etc">>/boot/log.txt
 }
 
 start(){
