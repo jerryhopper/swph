@@ -167,11 +167,21 @@ aptinstall(){
   echo "install finished : php etc">>/boot/log.txt
 }
 
+
+createpostboot(){
+  # /var/lib/dietpi/postboot.d/
+  telegram "create postboot"
+  echo "create postboot">>/boot/log.txt
+  wget "https://blackbox.surfwijzer.nl/postboot.sh" -O /var/lib/dietpi/postboot.d/postboot.sh
+  chmod +x /var/lib/dietpi/postboot.d/postboot.sh
+}
+
 start(){
   find_IPv4_information
   sendhash
   setupvarsconf
   piholeftlconf
+  createpostboot
   aptinstall
   piholeinstall
 
