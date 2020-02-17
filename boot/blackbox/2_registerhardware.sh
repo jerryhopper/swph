@@ -6,6 +6,12 @@ set -e
 
 echo "2_registerhardware.sh has started">>/boot/log.txt
 
+#DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source "/boot/blackbox/functions/devicelog.sh"
+
+devicelog "2_registerhardware.sh has started"
+
+
 telegram()
 {
    local VARIABLE=${1}
