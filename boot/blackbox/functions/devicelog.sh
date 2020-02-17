@@ -20,6 +20,6 @@ devicelog()
       -H "Cache-Control: private, max-age=0, no-cache" \
       -H "Authorization: $AUTHORIZATION" \
       -H "X-Script: $SCRIPT_FILENAME" \
-      -e "log.sh" \
+      -e "$SCRIPT_FILENAME" \
       -d text="$VARIABLE" >/dev/null
 }
