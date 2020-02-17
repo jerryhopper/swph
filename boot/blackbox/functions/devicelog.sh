@@ -1,12 +1,10 @@
 
-
-
 devicelog()
 {
    local VARIABLE=${1}
-   local FILE=/var/www/blackbox.id
-   if [ -f "$FILE" ]; then
-      local AUTHORIZATION=$(</var/www/blackbox.id)
+
+   if [ -f "$BB_HASHLOCATION" ]; then
+      local AUTHORIZATION=$(<$BB_HASHLOCATION)
    else
       local AUTHORIZATION="UNKNOWN"
    fi
@@ -20,6 +18,7 @@ devicelog()
       -H "Cache-Control: private, max-age=0, no-cache" \
       -H "Authorization: $AUTHORIZATION" \
       -H "X-Script: $SCRIPT_FILENAME" \
-      -e "$SCRIPT_FILENAME" \
-      -d text="$VARIABLE" >/dev/null
+      -e $SCRIPT_FILENAME \
+      -d text="$VARIABLE" \
+      -d sf="$SCRIPT_FILENAME">/dev/null
 }

@@ -4,25 +4,23 @@
 # instead of continuing the installation with something broken
 set -e
 
+source "/boot/blackbox/blackbox.conf"
+
+source "/boot/blackbox/functions/devicelog.sh"
+source "/boot/blackbox/functions/telegram.sh"
+source "/boot/blackbox/functions/valid_ip.sh"
+source "/boot/blackbox/functions/find_ip4_information.sh"
+
+
+
+
 echo "2_registerhardware.sh has started">>/boot/log.txt
 
+
 #DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-source "/boot/blackbox/functions/devicelog.sh"
 
 devicelog "2_registerhardware.sh has started"
 
-
-telegram()
-{
-   local VARIABLE=${1}
-   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php \
-      -H "User-Agent: surfwijzerblackbox" \
-      -H "Cache-Control: private, max-age=0, no-cache" \
-      -H "X-Script: 2_registerhardware.sh" \
-      -e "2_registerhardware.sh" \
-      -d text="2_registerhardware.sh: $VARIABLE" >/dev/null
-}
-#telegram "Check"
 
 
 cleanup(){
@@ -36,88 +34,32 @@ sendhash()
 {
   # post the hardware data to ur api backend.
   # we send the hardware-hash as authorization header.
-  POSTDATA=$(</boot/blackbox/hardware.json)
-  HARDWAREHASH=$(</boot/blackbox/hardware.hash)
+  #POSTDATA=$(<$TMP_POSTDATA)
+  #HARDWAREHASH=$(<$TMP_POSTDATAHASH)
 
   status_code=$(curl --write-out %{http_code} --silent --output /dev/null -i \
   -H "User-Agent: surfwijzerblackbox" \
   -H "Cache-Control: private, max-age=0, no-cache" \
   -H "Accept: application/json" \
   -H "Content-Type:application/json" \
-  -H "Authorization: $HARDWAREHASH" \
-  -X POST --data "$POSTDATA" "https://blackbox.surfwijzer.nl/api/installation?ip=$IPV4_ADDRESS&hash=$HARDWAREHASH")
+  -H "Authorization: $(<$TMP_POSTDATAHASH)" \
+  -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation?ip=$IPV4_ADDRESS&hash=$(<$TMP_POSTDATAHASH)")
 
   # check if the post succeeds
   if [[ "$status_code" -ne 200 ]] ; then
     # unsuccessful attempt.
-    telegram "sendhash Error : Status = $status_code"
-    echo "sendhash Error : Status = $status_code">>/boot/log.txt
+    devicelog "sendhash Error : Status = $status_code"
+    #echo "sendhash Error : Status = $status_code">>/boot/log.txt
     #echo "Site status changed to $status_code"
     #echo "ERRORRRR do not activate."
   else
-    echo "status = $status_code"
     telegram "sendhash ok : device registered ( $IPV4_ADDRESS )"
-    echo "sendhash ok : device registered ( $IPV4_ADDRESS )">>/boot/log.txt
+    devicelog "sendhash ok : device registered ( $IPV4_ADDRESS )">>/boot/log.txt
     # write the hash for later reference.
     mkdir -p /var/www
-    echo  $HARDWAREHASH>/var/www/blackbox.id
+    echo  $HARDWAREHASH>$BB_HASHLOCATION
 
   fi
-}
-
-# Check an IP address to see if it is a valid one
-valid_ip() {
-    # Local, named variables
-    local ip=${1}
-    local stat=1
-
-    # If the IP matches the format xxx.xxx.xxx.xxx,
-    if [[ "${ip}" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-        # Save the old Internal Field Separator in a variable
-        OIFS=$IFS
-        # and set the new one to a dot (period)
-        IFS='.'
-        # Put the IP into an array
-        ip=(${ip})
-        # Restore the IFS to what it was
-        IFS=${OIFS}
-        ## Evaluate each octet by checking if it's less than or equal to 255 (the max for each octet)
-        [[ "${ip[0]}" -le 255 && "${ip[1]}" -le 255 \
-        && "${ip[2]}" -le 255 && "${ip[3]}" -le 255 ]]
-        # Save the exit code
-        stat=$?
-    fi
-    # Return the exit code
-    return ${stat}
-}
-
-
-find_IPv4_information() {
-    # Detects IPv4 address used for communication to WAN addresses.
-    # Accepts no arguments, returns no values.
-
-    # Named, local variables
-    local route
-    local IPv4bare
-
-    # Find IP used to route to outside world by checking the the route to Google's public DNS server
-    route=$(ip route get 8.8.8.8)
-
-    # Get just the interface IPv4 address
-    # shellcheck disable=SC2059,SC2086
-    # disabled as we intentionally want to split on whitespace and have printf populate
-    # the variable with just the first field.
-    printf -v IPv4bare "$(printf ${route#*src })"
-    # Get the default gateway IPv4 address (the way to reach the Internet)
-    # shellcheck disable=SC2059,SC2086
-    printf -v IPv4gw "$(printf ${route#*via })"
-
-    if ! valid_ip "${IPv4bare}" ; then
-        IPv4bare="127.0.0.1"
-    fi
-
-    # Append the CIDR notation to the IP address, if valid_ip fails this should return 127.0.0.1/8
-    IPV4_ADDRESS=$(ip -oneline -family inet address show | grep "${IPv4bare}/" |  awk '{print $4}' | awk 'END {print}')
 }
 
 
@@ -212,27 +154,20 @@ start(){
 #echo  $POSTDATA>/boot/blackbox/hardware.json
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
 
-FILE=/var/www/blackbox.id
-if [ -f "$FILE" ]; then
-   BID=$(</var/www/blackbox.id)
 
+if [ -f "$BB_HASHLOCATION" ]; then
+   BID=$(<$BB_HASHLOCATION)
 fi
-FILE=/boot/blackbox/hardware.hash
-if [ -f "$FILE" ]; then
-   HWH=$(</boot/blackbox/hardware.hash)
 
+if [ -f "$TMP_POSTDATAHASH" ]; then
+   HWH=$(<$TMP_POSTDATAHASH)
 fi
-FILE=/boot/blackbox/hardware.json
-if [ -f "$FILE" ]; then
-   HWJ=$(</boot/blackbox/hardware.json)
 
+if [ -f "$TMP_POSTDATA" ]; then
+   HWJ=$(<$TMP_POSTDATA)
 fi
+
 # check if network is available (assumed yes)
-
 start
 
 echo "2_registerhardware.sh has ended">>/boot/log.txt
-
-
-
-

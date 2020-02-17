@@ -6,6 +6,14 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
+
+
+source "/boot/blackbox/blackbox.conf"
+
+
+
+
+
 echo "1_hardwaredetect.sh has started">>/boot/log.txt
 ######## VARIABLES #########
 # For better maintainability, we store as much information that can change in variables
@@ -46,8 +54,7 @@ POSTDATA=$(generate_post_data)
 HARDWAREHASH=$(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)
 
 # here we write the results of the hardwaretests to a file.
-echo  $POSTDATA>/boot/blackbox/hardware.json
-echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
-
+echo  $POSTDATA>$TMP_POSTDATA
+echo  $HARDWAREHASH>$TMP_POSTDATAHASH
 
 echo "1_hardwaredetect.sh has ended">>/boot/log.txt
