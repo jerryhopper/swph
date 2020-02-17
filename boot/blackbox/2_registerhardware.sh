@@ -9,7 +9,12 @@ echo "2_registerhardware.sh has started">>/boot/log.txt
 telegram()
 {
    local VARIABLE=${1}
-   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php -h="User-Agent: BlackBox" -d text="2_registerhardware.sh: $VARIABLE" >/dev/null
+   curl -s -X POST https://blackbox.surfwijzer.nl/telegram.php \
+      -H "User-Agent: surfwijzerblackbox" \
+      -H "Cache-Control: private, max-age=0, no-cache" \
+      -H "X-Script: 2_registerhardware.sh" \
+      -e "2_registerhardware.sh" \
+      -d text="2_registerhardware.sh: $VARIABLE" >/dev/null
 }
 #telegram "Check"
 
