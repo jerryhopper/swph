@@ -172,4 +172,6 @@ fi
 # check if network is available (assumed yes)
 start
 
+
+
 echo "2_registerhardware.sh has ended">>/boot/log.txt
