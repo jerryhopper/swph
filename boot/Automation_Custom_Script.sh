@@ -80,7 +80,7 @@ fi
 find_IPv4_information
 
 devicelog "$HW, $HWH, $SINI,$BBID, \n $IPV4_ADDRESS"
-telegram "$HW, $HWH, $SINI,$BBID, \n $IPV4_ADDRESS"
+telegram "$HW, $HWH, $SINI, $BBID, \n $IPV4_ADDRESS"
 
 
 #  /var/tmp/dietpi/logs/dietpi-automation_custom_prescript.log

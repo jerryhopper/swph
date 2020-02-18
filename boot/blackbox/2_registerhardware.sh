@@ -57,7 +57,7 @@ sendhash()
     #echo "ERRORRRR do not activate."
   else
     telegram "sendhash ok : device registered ( $IPV4_ADDRESS )"
-    devicelog "sendhash ok : device registered ( $IPV4_ADDRESS )">>/boot/log.txt
+    devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)">>/boot/log.txt
     # write the hash for later reference.
     mkdir -p /var/www
     echo  $HARDWAREHASH>$BB_HASHLOCATION
