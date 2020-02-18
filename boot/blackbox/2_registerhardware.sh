@@ -38,7 +38,7 @@ sendhash()
   # post the hardware data to ur api backend.
   # we send the hardware-hash as authorization header.
   #POSTDATA=$(<$TMP_POSTDATA)
-  #HARDWAREHASH=$(<$TMP_POSTDATAHASH)
+  HARDWAREHASH=$(<$TMP_POSTDATAHASH)
 
   status_code=$(curl --write-out %{http_code} --silent --output /dev/null -i \
   -H "User-Agent: surfwijzerblackbox" \
