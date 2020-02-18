@@ -16,11 +16,10 @@ FILE=/boot/blackbox/1_hardwaredetect.sh
 if [ -f "$FILE" ]; then
     # run hardware detection and create hardware.json & hardware.hash
     bash /boot/blackbox/1_hardwaredetect.sh
-    if[ DEVMODE = 0];then
+fi
+if[ $DEVMODE = 0]; then
       # after the hardwaretest, remove the script.
       rm -f /boot/blackbox/1_hardwaredetect.sh
-    fi
-
 fi
 
 echo "automation_custom_prescript has ended">>/boot/log.txt
