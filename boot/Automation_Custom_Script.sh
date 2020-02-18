@@ -66,7 +66,7 @@ if [ -f "$FILE" ]; then
     # the file exists!
     # this means the hardware-detect has already run.
     # we need to register the hardware in our product db
-    #bash /boot/blackbox/2_registerhardware.sh
+    bash /boot/blackbox/2_registerhardware.sh
     echo "#"
 fi
 
