@@ -67,6 +67,8 @@ sendhash()
 
 
 
+
+
 piholeftlconf(){
   echo "PRIVACYLEVEL=0" >/etc/pihole/pihole-FTL.conf
   echo "BLOCKINGMODE=IP-NODATA-AAAA" >>/etc/pihole/pihole-FTL.conf
