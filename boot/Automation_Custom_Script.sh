@@ -73,13 +73,13 @@ fi
 BBID=0
 FILE=/var/www/blackbox.id
 if [ -f "$FILE" ]; then
-   BBID=$(</var/www/blackbox.id)
+   BBID="$(</var/www/blackbox.id)"
 
 fi
 
 find_IPv4_information
 
-devicelog "$HW, $HWH, $SINI,$BBID, \n $IPV4_ADDRESS"
+devicelog "$HW, $HWH, $SINI, $BBID, \n $IPV4_ADDRESS"
 telegram "$HW, $HWH, $SINI, $BBID, \n $IPV4_ADDRESS"
 
 
