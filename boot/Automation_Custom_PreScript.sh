@@ -24,3 +24,4 @@ fi
 
 echo "automation_custom_prescript has ended">>/boot/log.txt
 
+
