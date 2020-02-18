@@ -151,6 +151,8 @@ start(){
   #piholeinstall
 }
 
+
+
 #echo  $HARDWAREHASH>/var/log/sinit.log
 #echo  $POSTDATA>/boot/blackbox/hardware.json
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
