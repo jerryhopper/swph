@@ -157,7 +157,6 @@ start(){
 #echo  $POSTDATA>/boot/blackbox/hardware.json
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
 
-
 if [ -f "$BB_HASHLOCATION" ]; then
    BID=$(<$BB_HASHLOCATION)
 fi
