@@ -152,7 +152,6 @@ start(){
 }
 
 
- 
 
 #echo  $HARDWAREHASH>/var/log/sinit.log
 #echo  $POSTDATA>/boot/blackbox/hardware.json
