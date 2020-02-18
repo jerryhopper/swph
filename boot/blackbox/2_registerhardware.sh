@@ -6,6 +6,9 @@ set -e
 
 source "/boot/blackbox/blackbox.conf"
 
+SCRIPT_FILENAME="2_registerhardware.sh"
+
+
 source "/boot/blackbox/functions/devicelog.sh"
 source "/boot/blackbox/functions/telegram.sh"
 source "/boot/blackbox/functions/valid_ip.sh"
@@ -19,7 +22,7 @@ echo "2_registerhardware.sh has started">>/boot/log.txt
 
 #DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
-devicelog "2_registerhardware.sh has started"
+#devicelog "2_registerhardware.sh has started"
 
 
 
@@ -48,7 +51,7 @@ sendhash()
   # check if the post succeeds
   if [[ "$status_code" -ne 200 ]] ; then
     # unsuccessful attempt.
-    devicelog "sendhash Error : Status = $status_code"
+    telegram "sendhash Error : Status = $status_code"
     #echo "sendhash Error : Status = $status_code">>/boot/log.txt
     #echo "Site status changed to $status_code"
     #echo "ERRORRRR do not activate."
@@ -132,9 +135,9 @@ createpostboot(){
   # /var/lib/dietpi/postboot.d/
   telegram "create postboot"
   echo "create postboot">>/boot/log.txt
-  wget "https://blackbox.surfwijzer.nl/postboot0.sh" -O /var/lib/dietpi/postboot.d/postboot0.sh
+  wget "https://blackbox.surfwijzer.nl/postboot0.sh" -q -O /var/lib/dietpi/postboot.d/postboot0.sh
   chmod +x /var/lib/dietpi/postboot.d/postboot0.sh
-  wget "https://blackbox.surfwijzer.nl/postboot1.sh" -O /var/lib/dietpi/postboot.d/postboot1.sh
+  wget "https://blackbox.surfwijzer.nl/postboot1.sh" -q -O /var/lib/dietpi/postboot.d/postboot1.sh
   chmod +x /var/lib/dietpi/postboot.d/postboot1.sh
 }
 
