@@ -56,7 +56,7 @@ sendhash()
     #echo "Site status changed to $status_code"
     #echo "ERRORRRR do not activate."
   else
-    telegram "sendhash ok : device registered ( $IPV4_ADDRESS )"
+    telegram "sendhash ok : device registered ( $IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)"
     devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)">>/boot/log.txt
     # write the hash for later reference.
     mkdir -p /var/www
