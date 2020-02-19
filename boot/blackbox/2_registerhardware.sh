@@ -146,10 +146,10 @@ createpostboot(){
 start(){
   find_IPv4_information
   sendhash
-  setupvarsconf
-  piholeftlconf
-  createpostboot
-  aptinstall
+  #setupvarsconf
+  #piholeftlconf
+  #createpostboot
+  #aptinstall
   #piholeinstall
 }
 
@@ -176,3 +176,4 @@ start
 
 
 echo "2_registerhardware.sh has ended">>/boot/log.txt
+telegram "2_registerhardware.sh has ended"

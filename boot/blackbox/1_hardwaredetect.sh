@@ -6,12 +6,7 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
-
-
 source "/boot/blackbox/blackbox.conf"
-
-
-
 
 
 echo "1_hardwaredetect.sh has started">>/boot/log.txt
