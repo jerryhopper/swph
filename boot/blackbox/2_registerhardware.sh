@@ -4,9 +4,11 @@
 # instead of continuing the installation with something broken
 set -e
 
-source "/boot/blackbox/blackbox.conf"
+echo "2_registerhardware.sh has started">>/boot/log.txt
 
 SCRIPT_FILENAME="2_registerhardware.sh"
+
+source "/boot/blackbox/blackbox.conf"
 
 
 source "/boot/blackbox/functions/devicelog.sh"
@@ -14,16 +16,8 @@ source "/boot/blackbox/functions/telegram.sh"
 source "/boot/blackbox/functions/valid_ip.sh"
 source "/boot/blackbox/functions/find_ip4_information.sh"
 
-
-
-
-echo "2_registerhardware.sh has started">>/boot/log.txt
-
-
 #DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
-
 #devicelog "2_registerhardware.sh has started"
-
 
 
 cleanup(){
@@ -32,6 +26,37 @@ cleanup(){
     rm -f /boot/blackbox/hardware.json
     rm -f /boot/blackbox/hardware.hash
 }
+
+
+createpostboot(){
+  # /var/lib/dietpi/postboot.d/
+  echo "create postboot">>/boot/log.txt
+  telegram "create postboot START"
+
+  curl  -s -X POST https://blackbox.surfwijzer.nl/scripts/postboot0.sh --output /var/lib/dietpi/postboot.d/postboot0.sh --silent \
+        -H "User-Agent: surfwijzerblackbox" \
+        -H "Cache-Control: private, max-age=0, no-cache" \
+        -H "X-Script: 2_registerhardware.sh" \
+        -e "2_registerhardware.sh" \
+        -d text="2_registerhardware.sh : download postboot0.sh" >/dev/null
+
+  if[ -f /var/lib/dietpi/postboot.d/postboot0.sh ];then
+      chmod +x /var/lib/dietpi/postboot.d/postboot0.sh
+  fi
+
+  curl  -s -X POST https://blackbox.surfwijzer.nl/scripts/postboot1.sh --output /var/lib/dietpi/postboot.d/postboot1.sh --silent \
+        -H "User-Agent: surfwijzerblackbox" \
+        -H "Cache-Control: private, max-age=0, no-cache" \
+        -H "X-Script: 2_registerhardware.sh" \
+        -e "2_registerhardware.sh" \
+        -d text="2_registerhardware.sh : download postboot1.sh" >/dev/null
+
+  if[ -f /var/lib/dietpi/postboot.d/postboot1.sh ];then
+      chmod +x /var/lib/dietpi/postboot.d/postboot1.sh
+  fi
+  echo "create postboot END">>/boot/log.txt
+}
+
 
 sendhash()
 {
@@ -58,6 +83,8 @@ sendhash()
   else
     telegram "sendhash ok : device registered ( $IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)"
     devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)">>/boot/log.txt
+
+    createpostboot
     # write the hash for later reference.
     mkdir -p /var/www
     echo  $HARDWAREHASH>$BB_HASHLOCATION
@@ -133,15 +160,6 @@ aptinstall(){
 }
 
 
-createpostboot(){
-  # /var/lib/dietpi/postboot.d/
-  telegram "create postboot"
-  echo "create postboot">>/boot/log.txt
-  wget "https://blackbox.surfwijzer.nl/postboot0.sh" -q -O /var/lib/dietpi/postboot.d/postboot0.sh
-  chmod +x /var/lib/dietpi/postboot.d/postboot0.sh
-  wget "https://blackbox.surfwijzer.nl/postboot1.sh" -q -O /var/lib/dietpi/postboot.d/postboot1.sh
-  chmod +x /var/lib/dietpi/postboot.d/postboot1.sh
-}
 
 start(){
   find_IPv4_information

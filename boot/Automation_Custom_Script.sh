@@ -20,68 +20,48 @@ source "/boot/blackbox/functions/telegram.sh"
 source "/boot/blackbox/functions/valid_ip.sh"
 source "/boot/blackbox/functions/find_ip4_information.sh"
 
-
 devicelog "start-test."
 
 
-
-
-
-
-
-FILE=/boot/blackbox/hardware.json
-if [ -f "$FILE" ]; then
-   HW="hw=y"
-   #telegram "EXISTS: $FILE"
+# FILE=/boot/blackbox/hardware.json
+# check if hardwaredata exists, then register.
+if [ -f "$TMP_POSTDATA" ]; then
+    HW="hw=y"
+    # the file exists!
+    # this means the hardware-detect has already run.
+    # we need to register the hardware in our product db
+    bash /boot/blackbox/2_registerhardware.sh
+    #telegram "EXISTS: $FILE"
 else
    HW="hw=n"
 fi
 
-FILE=/boot/blackbox/hardware.hash
-if [ -f "$FILE" ]; then
+
+if [ -f "$TMP_POSTDATAHASH" ]; then
    HWH="hwh=y"
    #telegram "EXISTS: $FILE"
 else
    HWH="hwh=n"
 fi
 
-FILE=/var/log/sinit.log
-if [ -f "$FILE" ]; then
-   SINI="sinit=y"
+
+BBID=0
+if [ -f "$BB_HASHLOCATION" ]; then
+   SINI="bbhash=y"
    #telegram "EXISTS: $FILE"
+   BBID="$(</var/www/blackbox.id)"
 else
-   SINI="sinit=n"
+   SINI="bbhash=n"
 fi
-
-
-
 
 #echo  $HARDWAREHASH>/var/log/sinit.log
 #echo  $POSTDATA>/boot/blackbox/hardware.json
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
 
-
-FILE=/boot/blackbox/hardware.json
-if [ -f "$FILE" ]; then
-    # the file exists!
-    # this means the hardware-detect has already run.
-    # we need to register the hardware in our product db
-    bash /boot/blackbox/2_registerhardware.sh
-    echo "#"
-fi
-
-BBID=0
-FILE=/var/www/blackbox.id
-if [ -f "$FILE" ]; then
-   BBID="$(</var/www/blackbox.id)"
-
-fi
-
 find_IPv4_information
 
 devicelog "$HW, $HWH, $SINI, $BBID, \n $IPV4_ADDRESS"
-telegram "$HW, $HWH, $SINI, $BBID, \n $IPV4_ADDRESS"
-
+telegram  "$HW, $HWH, $SINI, $BBID, \n $IPV4_ADDRESS"
 
 #  /var/tmp/dietpi/logs/dietpi-automation_custom_prescript.log
 #  /var/tmp/dietpi/logs/dietpi-automation_custom_script.log
