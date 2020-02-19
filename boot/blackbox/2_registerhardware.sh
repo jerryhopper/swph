@@ -40,7 +40,7 @@ createpostboot(){
         -e "2_registerhardware.sh" \
         -d text="2_registerhardware.sh : download postboot0.sh" >/dev/null
 
-  if[ -f /var/lib/dietpi/postboot.d/postboot0.sh ]; then
+  if [[ -f /var/lib/dietpi/postboot.d/postboot0.sh ]] ; then
       chmod +x /var/lib/dietpi/postboot.d/postboot0.sh
   fi
 
@@ -51,7 +51,7 @@ createpostboot(){
         -e "2_registerhardware.sh" \
         -d text="2_registerhardware.sh : download postboot1.sh" >/dev/null
 
-  if[ -f /var/lib/dietpi/postboot.d/postboot1.sh ]; then
+  if [[ -f /var/lib/dietpi/postboot.d/postboot1.sh ]] ; then
       chmod +x /var/lib/dietpi/postboot.d/postboot1.sh
   fi
   echo "create postboot END">>/boot/log.txt
