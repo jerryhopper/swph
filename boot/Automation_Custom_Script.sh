@@ -62,7 +62,8 @@ BBID=0
 if [ -f "$BB_HASHLOCATION" ]; then
    SINI="bbhash=y"
    #telegram "EXISTS: $FILE"
-   BBID="$($BB_HASHLOCATION)"
+   BBID=$(<$BB_HASHLOCATION)
+
 else
    SINI="bbhash=n"
 fi
