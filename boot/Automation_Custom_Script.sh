@@ -55,7 +55,6 @@ if [[ $DEVMODE = 0 ]] ; then
   #rm -f /boot/blackbox/2_registerhardware.sh
 fi
 
-
 BBID=0
 if [ -f "$BB_HASHLOCATION" ]; then
    SINI="bbhash=y"
