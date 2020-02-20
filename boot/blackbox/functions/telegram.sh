@@ -9,4 +9,3 @@ telegram()
         -e "$SCRIPT_FILENAME" \
         -d text="$SCRIPT_FILENAME : $VARIABLE" >/dev/null
 }
-

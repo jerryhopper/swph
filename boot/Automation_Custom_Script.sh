@@ -42,8 +42,8 @@ if [ -f "$TMP_POSTDATA" ]; then
     bash /boot/blackbox/2_registerhardware.sh
     # remove the helper files.
 
-    rm -f $TMP_POSTDATA
-    rm -f $TMP_POSTDATAHASH
+    #rm -f $TMP_POSTDATA
+    #rm -f $TMP_POSTDATAHASH
 
     #telegram "EXISTS: $FILE"
 else
