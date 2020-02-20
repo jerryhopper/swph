@@ -32,7 +32,6 @@ else
 fi
 
 
-
 # FILE=/boot/blackbox/hardware.json
 # check if hardwaredata exists, then register.
 if [ -f "$TMP_POSTDATA" ]; then
