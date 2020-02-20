@@ -23,8 +23,6 @@ source "/boot/blackbox/functions/find_ip4_information.sh"
 devicelog "Automation_Custom_Script.sh start."
 
 
-
-
 if [ -f "$TMP_POSTDATAHASH" ]; then
    HWH="hwh=y"
 
