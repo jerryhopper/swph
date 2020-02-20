@@ -24,6 +24,7 @@ devicelog "Automation_Custom_Script.sh start."
 
 
 
+
 if [ -f "$TMP_POSTDATAHASH" ]; then
    HWH="hwh=y"
 
