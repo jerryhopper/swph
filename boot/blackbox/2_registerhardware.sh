@@ -65,7 +65,7 @@ sendhash()
   -H "Accept: application/json" \
   -H "Content-Type:application/json" \
   -H "Authorization: $(<$TMP_POSTDATAHASH)" \
-  -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation/$(<$TMP_POSTDATAHASH)/?ip=$IPV4_ADDRESS")
+  -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation/$(<$TMP_POSTDATAHASH)/$IPV4_ADDRESS")
 
   # check if the post succeeds
   if [[ "$status_code" -ne 200 ]] ; then
