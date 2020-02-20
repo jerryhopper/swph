@@ -54,7 +54,8 @@ else
 fi
 
 if [[ $DEVMODE = 0 ]] ; then
-  rm -f /boot/blackbox/2_registerhardware.sh
+  echo "hm"
+  #rm -f /boot/blackbox/2_registerhardware.sh
 fi
 
 
