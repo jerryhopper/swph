@@ -7,6 +7,9 @@ echo "automation_custom_prescript has started">>/boot/log.txt
 
 source "/boot/blackbox/blackbox.conf"
 
+echo "0" > $BB_INSTALLSTATE
+
+
 # Custom Script (pre-networking and pre-DietPi install)
 # - Allows you to automatically execute a custom script before network is up on first boot.
 # - Copy your script to /boot/Automation_Custom_PreScript.sh and it will be executed automatically.
@@ -17,11 +20,10 @@ if [ -f "$FILE" ]; then
     # run hardware detection and create hardware.json & hardware.hash
     bash /boot/blackbox/1_hardwaredetect.sh
 fi
-if[ $DEVMODE = 0]; then
+if [[ $DEVMODE = 0 ]]; then
       # after the hardwaretest, remove the script.
       rm -f /boot/blackbox/1_hardwaredetect.sh
 fi
 
 echo "automation_custom_prescript has ended">>/boot/log.txt
-
-
+echo "1" > $BB_INSTALLSTATE

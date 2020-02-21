@@ -6,6 +6,7 @@ set -e
 
 SCRIPT_FILENAME="Automation_Custom_Script"
 
+
 echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 # Custom Script (post-networking and post-DietPi install)
 # - Allows you to automatically execute a custom script at the end of DietPi install.
@@ -15,12 +16,14 @@ echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 
 source "/boot/blackbox/blackbox.conf"
 
+echo "2" > $BB_INSTALLSTATE
+
 source "/boot/blackbox/functions/devicelog.sh"
 source "/boot/blackbox/functions/telegram.sh"
 source "/boot/blackbox/functions/valid_ip.sh"
 source "/boot/blackbox/functions/find_ip4_information.sh"
 
-devicelog "Automation_Custom_Script.sh start."
+#devicelog "Automation_Custom_Script.sh start."
 
 
 if [ -f "$TMP_POSTDATAHASH" ]; then
@@ -42,8 +45,12 @@ if [ -f "$TMP_POSTDATA" ]; then
     bash /boot/blackbox/2_registerhardware.sh
     # remove the helper files.
 
-    #rm -f $TMP_POSTDATA
-    #rm -f $TMP_POSTDATAHASH
+    if [[ $DEVMODE = 0 ]] ; then
+      devicelog "info,rm -f $TMP_POSTDATA"
+      rm -f $TMP_POSTDATA
+      rm -f $TMP_POSTDATAHASH
+    fi
+
 
     #telegram "EXISTS: $FILE"
 else
@@ -51,8 +58,8 @@ else
 fi
 
 if [[ $DEVMODE = 0 ]] ; then
-  echo "hm"
-  #rm -f /boot/blackbox/2_registerhardware.sh
+  devicelog "info,rm -f /boot/blackbox/2_registerhardware.sh"
+  rm -f /boot/blackbox/2_registerhardware.sh
 fi
 
 BBID=0
@@ -68,11 +75,11 @@ fi
 
 find_IPv4_information
 
-devicelog "$HW, $HWH, $SINI, $BBID, \n $IPV4_ADDRESS"
-telegram  "$HW, $HWH, $SINI, $BBID, \n $IPV4_ADDRESS"
+devicelog "info,$BBID,$IPV4_ADDRESS"
+#telegram  "$HW, $HWH, $SINI, $BBID,$IPV4_ADDRESS"
 
 #  /var/tmp/dietpi/logs/dietpi-automation_custom_prescript.log
 #  /var/tmp/dietpi/logs/dietpi-automation_custom_script.log
 
-devicelog "Automation_Custom_Script.sh end."
+#devicelog "Automation_Custom_Script.sh end."
 echo "Automation_Custom_Script.sh has ended">>/boot/log.txt

@@ -10,6 +10,11 @@ source "/boot/blackbox/blackbox.conf"
 
 
 echo "1_hardwaredetect.sh has started">>/boot/log.txt
+
+
+
+
+
 ######## VARIABLES #########
 # For better maintainability, we store as much information that can change in variables
 # This allows us to make a change in one place that can propagate to all instances of the variable
@@ -51,5 +56,8 @@ HARDWAREHASH=$(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)
 # here we write the results of the hardwaretests to a file.
 echo  $POSTDATA>$TMP_POSTDATA
 echo  $HARDWAREHASH>$TMP_POSTDATAHASH
+
+
+
 
 echo "1_hardwaredetect.sh has ended">>/boot/log.txt

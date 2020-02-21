@@ -30,6 +30,7 @@ createpostboot(){
         -H "User-Agent: surfwijzerblackbox" \
         -H "Cache-Control: private, max-age=0, no-cache" \
         -H "X-Script: 2_registerhardware.sh" \
+        -H "Authorization: $BID" \
         -e "2_registerhardware.sh" \
         -d text="2_registerhardware.sh : download postboot0.sh" >/dev/null
 
@@ -41,6 +42,7 @@ createpostboot(){
         -H "User-Agent: surfwijzerblackbox" \
         -H "Cache-Control: private, max-age=0, no-cache" \
         -H "X-Script: 2_registerhardware.sh" \
+        -H "Authorization: $BID" \
         -e "2_registerhardware.sh" \
         -d text="2_registerhardware.sh : download postboot1.sh" >/dev/null
 
@@ -63,6 +65,7 @@ sendhash()
   -H "User-Agent: surfwijzerblackbox" \
   -H "Cache-Control: private, max-age=0, no-cache" \
   -H "Accept: application/json" \
+  -H "X-Script: 2_registerhardware.sh" \
   -H "Content-Type:application/json" \
   -H "Authorization: $(<$TMP_POSTDATAHASH)" \
   -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation/$(<$TMP_POSTDATAHASH)/$IPV4_ADDRESS")
@@ -79,6 +82,7 @@ sendhash()
     devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)">>/boot/log.txt
 
     createpostboot
+    echo "5" > $BB_INSTALLSTATE
     # write the hash for later reference.
     mkdir -p /var/www
     echo  $HARDWAREHASH>$BB_HASHLOCATION
@@ -91,8 +95,11 @@ sendhash()
 
 
 start(){
+  echo "3" > $BB_INSTALLSTATE
   find_IPv4_information
+  echo "4" > $BB_INSTALLSTATE
   sendhash
+
   #setupvarsconf
   #piholeftlconf
   #createpostboot
