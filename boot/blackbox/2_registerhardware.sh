@@ -71,9 +71,10 @@ sendhash()
   -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation/$(<$TMP_POSTDATAHASH)/$IPV4_ADDRESS")
 
   # check if the post succeeds
-  if [[ "$status_code" -ne 200 ]] ; then
+  if [[ "$status_code" -ne 201 ]] ; then
     # unsuccessful attempt.
     telegram "sendhash Error : Status = $status_code"
+    devicelog "sendhash Error : Status = $status_code ($IPV4_ADDRESS)"
     #echo "sendhash Error : Status = $status_code">>/boot/log.txt
     #echo "Site status changed to $status_code"
     #echo "ERRORRRR do not activate."
