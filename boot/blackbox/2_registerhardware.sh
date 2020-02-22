@@ -84,15 +84,16 @@ sendhash()
   -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation/$HARDWAREHASH/$IPV4_ADDRESS")
 
   # check if the post succeeds
-  if [[ "$status_code" -ne 201 ]] ; then
+  if [[ "$status_code" -eq 200 ]] ; then
     # unsuccessful attempt.
-    telegram "sendhash Error : Status = $status_code"
-    devicelog "sendhash Error : Status = $status_code ($IPV4_ADDRESS)"
-    echo "sendhash Error : Status = $status_code ($IPV4_ADDRESS)" >>/boot/log.txt
+    telegram "sendhash Ok (already registered!) : Status = $status_code"
+    devicelog "sendhash Ok (already registered!) : Status = $status_code ($IPV4_ADDRESS)"
+    echo "sendhash Ok (already registered!)  : Status = $status_code ($IPV4_ADDRESS)" >>/boot/log.txt
     #echo "sendhash Error : Status = $status_code">>/boot/log.txt
     #echo "Site status changed to $status_code"
     #echo "ERRORRRR do not activate."
-  else
+  
+  elif [[ "$status_code" -eq 201  ]] ;then
     telegram "sendhash ok : device registered ( $IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)"
     devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)"
     echo "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)" >>/boot/log.txt
@@ -102,8 +103,11 @@ sendhash()
     mkdir -p /var/www
     echo  $HARDWAREHASH>$BB_HASHLOCATION
 
+  else
 
-
+    telegram "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"
+    devicelog "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"
+    echo "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"  >>/boot/log.txt
   fi
 }
 
