@@ -104,7 +104,7 @@ AUTO_SETUP_GLOBAL_PASSWORD=dietpi
 # - Add as many entries as you wish, one each line.
 # - DietPi will automatically install all pre-reqs (e.g. ALSA/X11 for desktops etc)
 # - E.g. the following (without the leading "#") will install the LXDE desktop automatically on first boot:
-AUTO_SETUP_INSTALL_SOFTWARE_ID=84
+# AUTO_SETUP_INSTALL_SOFTWARE_ID=84
 # -AUTO_SETUP_INSTALL_SOFTWARE_ID=93
 
 
@@ -180,7 +180,7 @@ CONFIG_CHECK_CONNECTION_IP=1.1.1.1
 CONFIG_CHECK_DNS_DOMAIN=one.one.one.one
 
 # DietPi checks for updates: Allows DietPi to check for updates on a daily basis and boot using a <1kb file download.
-CONFIG_CHECK_DIETPI_UPDATES=1
+CONFIG_CHECK_DIETPI_UPDATES=0
 # Optional: Automatically update DietPi when updates are available. Requires: CONFIG_CHECK_DIETPI_UPDATES=1
 CONFIG_AUTO_DIETPI_UPDATES=0
 
