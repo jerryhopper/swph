@@ -88,13 +88,14 @@ sendhash()
     # unsuccessful attempt.
     telegram "sendhash Error : Status = $status_code"
     devicelog "sendhash Error : Status = $status_code ($IPV4_ADDRESS)"
+    echo "sendhash Error : Status = $status_code ($IPV4_ADDRESS)" >>/boot/log.txt
     #echo "sendhash Error : Status = $status_code">>/boot/log.txt
     #echo "Site status changed to $status_code"
     #echo "ERRORRRR do not activate."
   else
     telegram "sendhash ok : device registered ( $IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)"
-    devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)">>/boot/log.txt
-
+    devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)"
+    echo "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)" >>/boot/log.txt
     createpostboot
     echo "5" > $BB_INSTALLSTATE
     # write the hash for later reference.
