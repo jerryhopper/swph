@@ -26,9 +26,10 @@ source "/boot/blackbox/functions/find_ip4_information.sh"
 #devicelog "Automation_Custom_Script.sh start."
 
 
+
+
 if [ -f "$TMP_POSTDATAHASH" ]; then
    HWH="hwh=y"
-
    #telegram "EXISTS: $FILE"
 else
    HWH="hwh=n"
@@ -61,6 +62,9 @@ if [[ $DEVMODE = 0 ]] ; then
   devicelog "info,rm -f /boot/blackbox/2_registerhardware.sh"
   rm -f /boot/blackbox/2_registerhardware.sh
 fi
+
+
+
 
 BBID=0
 if [ -f "$BB_HASHLOCATION" ]; then

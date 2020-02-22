@@ -12,9 +12,6 @@ source "/boot/blackbox/blackbox.conf"
 echo "1_hardwaredetect.sh has started">>/boot/log.txt
 
 
-
-
-
 ######## VARIABLES #########
 # For better maintainability, we store as much information that can change in variables
 # This allows us to make a change in one place that can propagate to all instances of the variable
@@ -50,11 +47,18 @@ EOF
 
 ### CREATE JSON ###
 POSTDATA=$(generate_post_data)
+
 ### CREATE HASH OF THE JSON
 HARDWAREHASH=$(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)
 
+
+
+
 # here we write the results of the hardwaretests to a file.
+#  /boot/blackbox/hardware.json
 echo  $POSTDATA>$TMP_POSTDATA
+
+#  /boot/blackbox/hardware.hash
 echo  $HARDWAREHASH>$TMP_POSTDATAHASH
 
 

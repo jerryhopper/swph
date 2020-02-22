@@ -6,7 +6,11 @@ devicelog()
    if [ -f "$BB_HASHLOCATION" ]; then
       local AUTHORIZATION=$(<$BB_HASHLOCATION)
    else
-      local AUTHORIZATION="UNKNOWN"
+     if [ -f "$TMP_POSTDATAHASH" ]; then
+       local AUTHORIZATION=$(<$TMP_POSTDATAHASH)
+     else
+       local AUTHORIZATION="UNKNOWN"
+     fi
    fi
    curl --connect-timeout 5 \
       --max-time 20 \

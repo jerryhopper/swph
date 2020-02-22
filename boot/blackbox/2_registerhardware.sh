@@ -11,6 +11,8 @@ SCRIPT_FILENAME="2_registerhardware.sh"
 source "/boot/blackbox/blackbox.conf"
 
 
+
+
 source "/boot/blackbox/functions/devicelog.sh"
 source "/boot/blackbox/functions/telegram.sh"
 source "/boot/blackbox/functions/valid_ip.sh"
@@ -18,6 +20,9 @@ source "/boot/blackbox/functions/find_ip4_information.sh"
 
 #DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 #devicelog "2_registerhardware.sh has started"
+
+BBID=$(<$BB_HASHLOCATION)
+HARDWAREHASH=$(<$TMP_POSTDATAHASH)
 
 
 
@@ -67,8 +72,8 @@ sendhash()
   -H "Accept: application/json" \
   -H "X-Script: 2_registerhardware.sh" \
   -H "Content-Type:application/json" \
-  -H "Authorization: $(<$TMP_POSTDATAHASH)" \
-  -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation/$(<$TMP_POSTDATAHASH)/$IPV4_ADDRESS")
+  -H "Authorization: $HARDWAREHASH" \
+  -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation/$HARDWAREHASH/$IPV4_ADDRESS")
 
   # check if the post succeeds
   if [[ "$status_code" -ne 201 ]] ; then
