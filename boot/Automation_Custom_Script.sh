@@ -87,3 +87,6 @@ devicelog "info,$BBID,$IPV4_ADDRESS"
 
 #devicelog "Automation_Custom_Script.sh end."
 echo "Automation_Custom_Script.sh has ended">>/boot/log.txt
+
+
+#exit
