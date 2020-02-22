@@ -21,7 +21,15 @@ source "/boot/blackbox/functions/find_ip4_information.sh"
 #DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 #devicelog "2_registerhardware.sh has started"
 
-BBID=$(<$BB_HASHLOCATION)
+
+if [ -f "$BB_HASHLOCATION" ]; then
+  BID=$(<$BB_HASHLOCATION)
+else
+  BID=$(<$TMP_POSTDATAHASH)
+fi
+
+
+
 HARDWAREHASH=$(<$TMP_POSTDATAHASH)
 
 
