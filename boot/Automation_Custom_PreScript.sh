@@ -18,12 +18,14 @@ echo "0" > $BB_INSTALLSTATE
 FILE=/boot/blackbox/1_hardwaredetect.sh
 if [ -f "$FILE" ]; then
     # run hardware detection and create hardware.json & hardware.hash
+    echo "automation_custom_prescript: running 1_hardwaredetect.sh">>/boot/log.txt
     bash /boot/blackbox/1_hardwaredetect.sh
 fi
 # delete if devmode is disabled.
 if [[ $DEVMODE = 0 ]]; then
-      # after the hardwaretest, remove the script.
-      rm -f /boot/blackbox/1_hardwaredetect.sh
+    # after the hardwaretest, remove the script.
+    echo "automation_custom_prescript: devmode = 0, remove 1_hardwaredetect.sh">>/boot/log.txt
+    rm -f /boot/blackbox/1_hardwaredetect.sh
 fi
 
 echo "automation_custom_prescript has ended">>/boot/log.txt
