@@ -6,7 +6,12 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
+source "/boot/blackbox/blackbox.conf"
+
+
 echo "1_hardwaredetect.sh has started">>/boot/log.txt
+
+
 ######## VARIABLES #########
 # For better maintainability, we store as much information that can change in variables
 # This allows us to make a change in one place that can propagate to all instances of the variable
@@ -14,6 +19,9 @@ echo "1_hardwaredetect.sh has started">>/boot/log.txt
 # Local variables will be in lowercase and will exist only within functions
 # It's still a work in progress, so you may see some variance in this guideline until it is complete
 
+
+
+### GET DEVICE/SETUP SPECIFIC VALUES ###
 MID=$(cat /etc/machine-id)
 MAC=$(ip addr show eth0|grep "ether"|cut -d' ' -f 6)
 MEMALL=$(cat /proc/meminfo|grep -m 1 "MemTotal"|cut -d' ' -f 2-);
@@ -37,13 +45,23 @@ generate_post_data()
 EOF
 }
 
+### CREATE JSON ###
 POSTDATA=$(generate_post_data)
+
+### CREATE HASH OF THE JSON
 HARDWAREHASH=$(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)
 
+
+
+
 # here we write the results of the hardwaretests to a file.
-echo  $POSTDATA>/boot/blackbox/hardware.json
-echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
-#sudo echo  $HARDWAREHASH>/var/log/sinit.log
+#  /boot/blackbox/hardware.json
+echo  $POSTDATA>$TMP_POSTDATA
+
+#  /boot/blackbox/hardware.hash
+echo  $HARDWAREHASH>$TMP_POSTDATAHASH
+
+
 
 
 echo "1_hardwaredetect.sh has ended">>/boot/log.txt
