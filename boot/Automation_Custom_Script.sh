@@ -25,11 +25,13 @@ source "/etc/blackbox/blackbox.conf"
 
 echo "2" > $BB_STATE
 
+echo "Automation_Custom_Script.sh A ">>/boot/log.txt
 source "/usr/share/blackbox/func/devicelog.sh"
 source "/usr/share/blackbox/func/telegram.sh"
 source "/usr/share/blackbox/func/valid_ip.sh"
 source "/usr/share/blackbox/func/find_ip4_information.sh"
 
+echo "Automation_Custom_Script.sh B ">>/boot/log.txt
 
 #devicelog "Automation_Custom_Script.sh start."
 
@@ -39,6 +41,7 @@ source "/usr/share/blackbox/func/find_ip4_information.sh"
 if [ -f "$BB_JSON" ]; then
     # the file exists!
     echo "run 2_registerhardware" > $BB_STATE
+    echo "run 2_registerhardwar ">>/boot/log.txt
     # this means the hardware-detect has already run.
     # we need to register the hardware in our product db
     bash /usr/share/blackbox/2_registerhardware.sh
