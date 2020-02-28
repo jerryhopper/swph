@@ -5,13 +5,22 @@
 set -e
 echo "automation_custom_prescript has started">>/boot/log.txt
 
-source "/etc/blackbox/blackbox.conf"
+
+if [ -f "/etc/blackbox/blackbox.conf" ]; then
+  source "/etc/blackbox/blackbox.conf"
+  echo "bbstate=$BB_STATE">>/boot/log.txt
+  echo "bbjson=$BB_JSON">>/boot/log.txt
+
+else
+  echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
+fi
+
 
 echo "0" > $BB_STATE
 
 
-mv -v -f /boot/installsrc/usr/share/blackbox /usr/share 
-mv -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
+cp -v -f /boot/installsrc/usr/share/blackbox /usr/share
+cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
 
 # Custom Script (pre-networking and pre-DietPi install)
 # - Allows you to automatically execute a custom script before network is up on first boot.
@@ -31,4 +40,4 @@ if [[ $DEVMODE = 0 ]]; then
 fi
 
 echo "automation_custom_prescript has ended">>/boot/log.txt
-echo "1" > $BB_STATE
+echo "1" >> $BB_STATE

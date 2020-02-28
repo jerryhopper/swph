@@ -38,12 +38,14 @@ source "/usr/share/blackbox/func/find_ip4_information.sh"
 # check if hardwaredata exists, then register.
 if [ -f "$BB_JSON" ]; then
     # the file exists!
+    echo "run 2_registerhardware" > $BB_STATE
     # this means the hardware-detect has already run.
     # we need to register the hardware in our product db
     bash /usr/share/blackbox/2_registerhardware.sh
     # remove the helper files.
-
+else
     #telegram "EXISTS: $FILE"
+    echo "no bbjson" > $BB_STATE
 fi
 
 

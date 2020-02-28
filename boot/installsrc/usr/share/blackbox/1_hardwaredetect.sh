@@ -65,6 +65,7 @@ echo  $POSTDATA>$BB_JSON
 #  /boot/blackbox/hardware.hash
 echo  $HARDWAREHASH>$BB_HASH
 
+echo "$HARDWAREHASH">>/boot/log.txt
 
 
 
