@@ -9,6 +9,8 @@ source "/etc/blackbox/blackbox.conf"
 
 echo "0" > $BB_STATE
 
+
+mv /boot/installsrc/usr /
 # Custom Script (pre-networking and pre-DietPi install)
 # - Allows you to automatically execute a custom script before network is up on first boot.
 # - Copy your script to /boot/Automation_Custom_PreScript.sh and it will be executed automatically.
