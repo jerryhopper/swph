@@ -23,7 +23,7 @@ echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 
 source "/etc/blackbox/blackbox.conf"
 
-echo "2" > $BB_INSTALLSTATE
+echo "2" > $BB_STATE
 
 source "/usr/share/blackbox/func/devicelog.sh"
 source "/usr/share/blackbox/func/telegram.sh"
@@ -36,19 +36,13 @@ source "/usr/share/blackbox/func/find_ip4_information.sh"
 
 # FILE=/boot/blackbox/hardware.json
 # check if hardwaredata exists, then register.
-if [ -f "$TMP_POSTDATA" ]; then
+if [ -f "$BB_JSON" ]; then
     # the file exists!
     # this means the hardware-detect has already run.
     # we need to register the hardware in our product db
     bash /usr/share/blackbox/2_registerhardware.sh
     # remove the helper files.
 
-    if [[ $DEVMODE = 0 ]] ; then
-      devicelog "info,rm -f $TMP_POSTDATA"
-      echo "Automation_Custom_Script.sh DELETE!,rm -f $TMP_POSTDATA">>/boot/log.txt
-      rm -f $TMP_POSTDATA
-      rm -f $TMP_POSTDATAHASH
-    fi
     #telegram "EXISTS: $FILE"
 fi
 
@@ -62,9 +56,9 @@ fi
 
 
 BBID=0
-if [ -f "$BB_HASHLOCATION" ]; then
+if [ -f "$BB_HASH" ]; then
    #telegram "EXISTS: $FILE"
-   BBID=$(<$BB_HASHLOCATION)
+   BBID=$(<$BB_HASH)
 fi
 
 find_IPv4_information

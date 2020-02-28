@@ -20,15 +20,13 @@ source "/usr/share/blackbox/func/find_ip4_information.sh"
 #devicelog "2_registerhardware.sh has started"
 
 
-if [ -f "$BB_HASHLOCATION" ]; then
-  BID=$(<$BB_HASHLOCATION)
-else
-  BID=$(<$TMP_POSTDATAHASH)
+if [ -f "$BB_HASH" ]; then
+  BID=$(<$BB_HASH)
 fi
 
 
 
-HARDWAREHASH=$(<$TMP_POSTDATAHASH)
+HARDWAREHASH=$(<$BB_HASH)
 
 
 
@@ -78,8 +76,8 @@ sendhash()
   -H "Accept: application/json" \
   -H "X-Script: 2_registerhardware.sh" \
   -H "Content-Type:application/json" \
-  -H "Authorization: $HARDWAREHASH" \
-  -X POST --data "$(<$TMP_POSTDATA)" "https://api.surfwijzer.nl/blackbox/api/installation/$HARDWAREHASH/$IPV4_ADDRESS")
+  -H "Authorization: $BID" \
+  -X POST --data "$(<$BB_JSON)" "https://api.surfwijzer.nl/blackbox/api/installation/$BID/$IPV4_ADDRESS")
 
   # check if the post succeeds
   if [[ "$status_code" -eq 200 ]] ; then
@@ -92,14 +90,14 @@ sendhash()
     #echo "ERRORRRR do not activate."
 
   elif [[ "$status_code" -eq 201  ]] ;then
-    telegram "sendhash ok : device registered ( $IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)"
-    devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)"
-    echo "sendhash ok : device registered ($IPV4_ADDRESS) $(<$TMP_POSTDATAHASH)" >>/boot/log.txt
+    telegram "sendhash ok : device registered ( $IPV4_ADDRESS) $BID"
+    devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $BID"
+    echo "sendhash ok : device registered ($IPV4_ADDRESS) $BID" >>/boot/log.txt
     createpostboot
-    echo "5" > $BB_INSTALLSTATE
+    echo "5" > $BB_STATE
     # write the hash for later reference.
     mkdir -p /var/www
-    echo  $HARDWAREHASH>$BB_HASHLOCATION
+    #echo  $HARDWAREHASH>$BB_HASHLOCATION
 
   else
 
@@ -112,9 +110,9 @@ sendhash()
 
 
 start(){
-  echo "3" > $BB_INSTALLSTATE
+  echo "3" > $BB_STATE
   find_IPv4_information
-  echo "4" > $BB_INSTALLSTATE
+  echo "4" > $BB_STATE
   sendhash
 
   #setupvarsconf
@@ -129,16 +127,16 @@ start(){
 #echo  $POSTDATA>/boot/blackbox/hardware.json
 #echo  $HARDWAREHASH>/boot/blackbox/hardware.hash
 
-if [ -f "$BB_HASHLOCATION" ]; then
-   BID=$(<$BB_HASHLOCATION)
+if [ -f "$BB_HASH" ]; then
+   BID=$(<$BB_HASH)
 fi
 
 if [ -f "$TMP_POSTDATAHASH" ]; then
    HWH=$(<$TMP_POSTDATAHASH)
 fi
 
-if [ -f "$TMP_POSTDATA" ]; then
-   HWJ=$(<$TMP_POSTDATA)
+if [ -f "$BB_JSON" ]; then
+   HWJ=$(<$BB_JSON)
 fi
 
 # check if network is available (assumed yes)

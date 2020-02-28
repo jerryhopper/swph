@@ -60,10 +60,10 @@ HARDWAREHASH=$(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)
 
 # here we write the results of the hardwaretests to a file.
 #  /boot/blackbox/hardware.json
-echo  $POSTDATA>$TMP_POSTDATA
+echo  $POSTDATA>$BB_JSON
 
 #  /boot/blackbox/hardware.hash
-echo  $HARDWAREHASH>$TMP_POSTDATAHASH
+echo  $HARDWAREHASH>$BB_HASH
 
 
 
