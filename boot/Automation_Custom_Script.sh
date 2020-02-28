@@ -25,10 +25,10 @@ source "/etc/blackbox/blackbox.conf"
 
 echo "2" > $BB_INSTALLSTATE
 
-source "/usr/share/blackbox/devicelog.sh"
-source "/usr/share/blackbox/telegram.sh"
-source "/usr/share/blackbox/valid_ip.sh"
-source "/usr/share/blackbox/find_ip4_information.sh"
+source "/usr/share/blackbox/func/devicelog.sh"
+source "/usr/share/blackbox/func/telegram.sh"
+source "/usr/share/blackbox/func/valid_ip.sh"
+source "/usr/share/blackbox/func/find_ip4_information.sh"
 
 
 #devicelog "Automation_Custom_Script.sh start."
@@ -40,7 +40,7 @@ if [ -f "$TMP_POSTDATA" ]; then
     # the file exists!
     # this means the hardware-detect has already run.
     # we need to register the hardware in our product db
-    bash /usr/share/2_registerhardware.sh
+    bash /usr/share/blackbox/2_registerhardware.sh
     # remove the helper files.
 
     if [[ $DEVMODE = 0 ]] ; then
@@ -54,8 +54,8 @@ fi
 
 
 if [[ $DEVMODE = 0 ]] ; then
-  devicelog "info,rm -f /usr/share/2_registerhardware.sh"
-  rm -f /usr/share/2_registerhardware.sh
+  devicelog "info,rm -f /usr/share/blackbox/2_registerhardware.sh"
+  rm -f /usr/share/blackbox/2_registerhardware.sh
 fi
 
 

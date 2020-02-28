@@ -8,15 +8,13 @@ echo "2_registerhardware.sh has started">>/boot/log.txt
 
 SCRIPT_FILENAME="2_registerhardware.sh"
 
-source "/boot/blackbox/blackbox.conf"
+source "/etc/blackbox/blackbox.conf"
 
+source "/usr/share/blackbox/func/devicelog.sh"
+source "/usr/share/blackbox/func/telegram.sh"
+source "/usr/share/blackbox/func/valid_ip.sh"
+source "/usr/share/blackbox/func/find_ip4_information.sh"
 
-
-
-source "/boot/blackbox/functions/devicelog.sh"
-source "/boot/blackbox/functions/telegram.sh"
-source "/boot/blackbox/functions/valid_ip.sh"
-source "/boot/blackbox/functions/find_ip4_information.sh"
 
 #DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 #devicelog "2_registerhardware.sh has started"

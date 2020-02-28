@@ -6,7 +6,7 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
-source "/boot/blackbox/blackbox.conf"
+source "/etc/blackbox/blackbox.conf"
 
 
 echo "1_hardwaredetect.sh has started">>/boot/log.txt
@@ -47,7 +47,7 @@ EOF
 
 
 
-mkdir -p /etc/blackbox
+#mkdir -p /etc/blackbox
 
 ### CREATE JSON ###
 POSTDATA=$(generate_post_data)
