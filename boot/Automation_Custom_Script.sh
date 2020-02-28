@@ -6,6 +6,13 @@ set -e
 
 SCRIPT_FILENAME="Automation_Custom_Script"
 
+#
+#  /etc/blackbox/ dir with options.
+#
+#  /usr/lib/blackbox    Executable
+#  /usr/sbin/blackbox   Executable
+#  /usr/share/blackbox/ Dir with libraries
+#
 
 echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 # Custom Script (post-networking and post-DietPi install)
@@ -14,14 +21,15 @@ echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 # - Option 1 = Host your script online, then use e.g. AUTO_SETUP_CUSTOM_SCRIPT_EXEC=https://myweb.com/myscript.sh and it will be downloaded and executed automatically.
 # - Executed script log: /var/tmp/dietpi/logs/dietpi-automation_custom_script.log
 
-source "/boot/blackbox/blackbox.conf"
+source "/etc/blackbox/blackbox.conf"
 
 echo "2" > $BB_INSTALLSTATE
 
-source "/boot/blackbox/functions/devicelog.sh"
-source "/boot/blackbox/functions/telegram.sh"
-source "/boot/blackbox/functions/valid_ip.sh"
-source "/boot/blackbox/functions/find_ip4_information.sh"
+source "/usr/share/blackbox/devicelog.sh"
+source "/usr/share/blackbox/telegram.sh"
+source "/usr/share/blackbox/valid_ip.sh"
+source "/usr/share/blackbox/find_ip4_information.sh"
+
 
 #devicelog "Automation_Custom_Script.sh start."
 
@@ -32,7 +40,7 @@ if [ -f "$TMP_POSTDATA" ]; then
     # the file exists!
     # this means the hardware-detect has already run.
     # we need to register the hardware in our product db
-    bash /boot/blackbox/2_registerhardware.sh
+    bash /usr/share/2_registerhardware.sh
     # remove the helper files.
 
     if [[ $DEVMODE = 0 ]] ; then
@@ -46,8 +54,8 @@ fi
 
 
 if [[ $DEVMODE = 0 ]] ; then
-  devicelog "info,rm -f /boot/blackbox/2_registerhardware.sh"
-  rm -f /boot/blackbox/2_registerhardware.sh
+  devicelog "info,rm -f /usr/share/2_registerhardware.sh"
+  rm -f /usr/share/2_registerhardware.sh
 fi
 
 
@@ -58,7 +66,6 @@ if [ -f "$BB_HASHLOCATION" ]; then
    #telegram "EXISTS: $FILE"
    BBID=$(<$BB_HASHLOCATION)
 fi
-
 
 find_IPv4_information
 

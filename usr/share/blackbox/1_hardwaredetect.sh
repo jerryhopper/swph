@@ -45,6 +45,10 @@ generate_post_data()
 EOF
 }
 
+
+
+mkdir -p /etc/blackbox
+
 ### CREATE JSON ###
 POSTDATA=$(generate_post_data)
 
