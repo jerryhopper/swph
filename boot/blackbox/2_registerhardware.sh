@@ -39,7 +39,7 @@ createpostboot(){
   echo "create postboot">>/boot/log.txt
   #telegram "create postboot START"
 
-  curl  -s -X POST https://blackbox.surfwijzer.nl/scripts/postboot0.sh --output /var/lib/dietpi/postboot.d/postboot0.sh --silent \
+  curl  -s -X POST https://api.surfwijzer.nl/blackbox/scripts/postboot0.sh --output /var/lib/dietpi/postboot.d/postboot0.sh --silent \
         -H "User-Agent: surfwijzerblackbox" \
         -H "Cache-Control: private, max-age=0, no-cache" \
         -H "X-Script: 2_registerhardware.sh" \
@@ -51,7 +51,7 @@ createpostboot(){
       chmod +x /var/lib/dietpi/postboot.d/postboot0.sh
   fi
   sleep 1
-  curl  -s -X POST https://blackbox.surfwijzer.nl/scripts/postboot1.sh --output /var/lib/dietpi/postboot.d/postboot1.sh --silent \
+  curl  -s -X POST https://api.surfwijzer.nl/blackbox/scripts/postboot1.sh --output /var/lib/dietpi/postboot.d/postboot1.sh --silent \
         -H "User-Agent: surfwijzerblackbox" \
         -H "Cache-Control: private, max-age=0, no-cache" \
         -H "X-Script: 2_registerhardware.sh" \
@@ -81,7 +81,7 @@ sendhash()
   -H "X-Script: 2_registerhardware.sh" \
   -H "Content-Type:application/json" \
   -H "Authorization: $HARDWAREHASH" \
-  -X POST --data "$(<$TMP_POSTDATA)" "https://blackbox.surfwijzer.nl/api/installation/$HARDWAREHASH/$IPV4_ADDRESS")
+  -X POST --data "$(<$TMP_POSTDATA)" "https://api.surfwijzer.nl/blackbox/api/installation/$HARDWAREHASH/$IPV4_ADDRESS")
 
   # check if the post succeeds
   if [[ "$status_code" -eq 200 ]] ; then

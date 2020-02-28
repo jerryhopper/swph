@@ -2,7 +2,7 @@
 telegram()
 {
    local VARIABLE=${1}
-   curl -s -X POST https://blackbox.surfwijzer.nl/api/telegram \
+   curl -s -X POST https://api.surfwijzer.nl/blackbox/api/telegram \
         -H "User-Agent: surfwijzerblackbox" \
         -H "Cache-Control: private, max-age=0, no-cache" \
         -H "X-Script: $SCRIPT_FILENAME" \

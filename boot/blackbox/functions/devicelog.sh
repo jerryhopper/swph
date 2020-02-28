@@ -14,7 +14,7 @@ devicelog()
    fi
    curl --connect-timeout 5 \
       --max-time 20 \
-      -s -X POST https://blackbox.surfwijzer.nl/api/devicelog \
+      -s -X POST https://api.surfwijzer.nl/blackbox/api/devicelog \
       -H "User-Agent: surfwijzerblackbox" \
       -H "Cache-Control: private, max-age=0, no-cache" \
       -H "Authorization: $AUTHORIZATION" \
