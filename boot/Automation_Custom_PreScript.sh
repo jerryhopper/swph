@@ -15,7 +15,7 @@ echo "0" > $BB_INSTALLSTATE
 # - Copy your script to /boot/Automation_Custom_PreScript.sh and it will be executed automatically.
 # - Executed script log: /var/tmp/dietpi/logs/dietpi-automation_custom_prescript.log
 
-FILE=/boot/blackbox/1_hardwaredetect.sh
+FILE=/usr/share/blackbox/1_hardwaredetect.sh
 if [ -f "$FILE" ]; then
     # run hardware detection and create hardware.json & hardware.hash
     echo "automation_custom_prescript: running 1_hardwaredetect.sh">>/boot/log.txt
