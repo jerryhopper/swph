@@ -50,10 +50,10 @@ if [ "$1" == "check"]; then
 fi
 
 if [ "$1" == "install" ]; then
-
+    echo "INSTALLSTATE=$INSTALLSTATE"
 fi
 
 if [ "$1" == "configure" ]; then
-
+    echo "INSTALLSTATE=$INSTALLSTATE"
 fi
 
