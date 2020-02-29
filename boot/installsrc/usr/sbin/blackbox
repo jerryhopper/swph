@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 includeSources(){
     source "/usr/share/blackbox/func/devicelog.sh"
     source "/usr/share/blackbox/func/telegram.sh"
@@ -34,7 +32,7 @@ else
 fi
 
 
-if [ "$1" == "check"]; then
+if [ "$1" == "check" ]; then
     # check installstate, if installstate == 0, copy files.
     if [ "$INSTALLSTATE" == "1" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
