@@ -19,19 +19,25 @@ echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 # - Option 0 = Copy your script to /boot/Automation_Custom_Script.sh and it will be executed automatically.
 # - Option 1 = Host your script online, then use e.g. AUTO_SETUP_CUSTOM_SCRIPT_EXEC=https://myweb.com/myscript.sh and it will be downloaded and executed automatically.
 # - Executed script log: /var/tmp/dietpi/logs/dietpi-automation_custom_script.log
-
-source "/etc/blackbox/blackbox.conf"
+if [ -f "/etc/blackbox/blackbox.conf" ]; then
+  source "/etc/blackbox/blackbox.conf"
+  echo "/etc/blackbox/blackbox.conf exists">>/boot/log.txt
+else
+  echo "/etc/blackbox/blackbox.conf doesnot exist ">>/boot/log.txt
+fi
 
 echo "2" > $BB_STATE
 
 echo "Automation_Custom_Script.sh A ">>/boot/log.txt
 
 if [ -f "/usr/share/blackbox/func/devicelog.sh" ]; then
+  echo "/usr/share/blackbox/func/devicelog.sh Exists ">>/boot/log.txt
   source "/usr/share/blackbox/func/devicelog.sh"
   source "/usr/share/blackbox/func/telegram.sh"
   source "/usr/share/blackbox/func/valid_ip.sh"
   source "/usr/share/blackbox/func/find_ip4_information.sh"
 else
+  echo "/usr/share/blackbox/func/devicelog.sh DOES NOT Exist  ">>/boot/log.txt
   source "/boot/installsrc/usr/share/blackbox/func/devicelog.sh"
   source "/boot/installsrc/usr/share/blackbox/func/telegram.sh"
   source "/boot/installsrc/usr/share/blackbox/func/valid_ip.sh"

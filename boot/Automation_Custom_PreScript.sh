@@ -19,6 +19,7 @@ echo "0" > $BB_STATE
 
 cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
 cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
+chmod +x /usr/sbin
 
 # Custom Script (pre-networking and pre-DietPi install)
 # - Allows you to automatically execute a custom script before network is up on first boot.
@@ -26,15 +27,20 @@ cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
 # - Executed script log: /var/tmp/dietpi/logs/dietpi-automation_custom_prescript.log
 
 if [ -f "$BB_JSON" ]; then
-    # run hardware detection and create hardware.json & hardware.hash
-    echo "automation_custom_prescript: running 1_hardwaredetect.sh">>/boot/log.txt
-    bash /usr/share/blackbox/1_hardwaredetect.sh
+  # run hardware detection and create hardware.json & hardware.hash
+  echo "automation_custom_prescript: running 1_hardwaredetect.sh">>/boot/log.txt
+  bash /usr/share/blackbox/1_hardwaredetect.sh
+else
+  echo "BB_JSON=$BB_JSON">>/boot/log.txt
 fi
 # delete if devmode is disabled.
 if [[ $DEVMODE = 0 ]]; then
     # after the hardwaretest, remove the script.
     echo "automation_custom_prescript: devmode = 0, remove 1_hardwaredetect.sh">>/boot/log.txt
     rm -f /usr/share/blackbox/1_hardwaredetect.sh
+else
+  echo "DEVMODE=$DEVMODE">>/boot/log.txt
+
 fi
 
 echo "automation_custom_prescript has ended">>/boot/log.txt
