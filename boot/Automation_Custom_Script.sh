@@ -67,6 +67,7 @@ if [ -f "$BB_JSON" ]; then
     # remove the helper files.
 else
     #telegram "EXISTS: $FILE"
+    echo "BB_JSON doesnt exist? ($BB_JSON) ">>/boot/log.txt
     echo "no bbjson" > $BB_STATE
 fi
 
@@ -83,6 +84,8 @@ BBID=0
 if [ -f "$BB_HASH" ]; then
    #telegram "EXISTS: $FILE"
    BBID=$(<$BB_HASH)
+else
+  echo "BB_HASH doesnt exist? ($BB_HASH) ">>/boot/log.txt
 fi
 
 find_IPv4_information
