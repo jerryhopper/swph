@@ -4,6 +4,18 @@
 # instead of continuing the installation with something broken
 set -e
 
+if [ ! -f "/usr/share/sbin/blackbox" ]; then
+  # no blackbox binary found, installing.
+  cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
+  chmod +x /usr/sbin/blackbox
+fi
+
+
+/usr/sbin/blackbox check
+
+
+
+
 exit 0
 SCRIPT_FILENAME="Automation_Custom_Script"
 
@@ -30,20 +42,6 @@ fi
 echo "2" > $BB_STATE
 
 echo "Automation_Custom_Script.sh A ">>/boot/log.txt
-
-if [ -f "/usr/share/blackbox/func/devicelog.sh" ]; then
-  echo "/usr/share/blackbox/func/devicelog.sh Exists ">>/boot/log.txt
-  source "/usr/share/blackbox/func/devicelog.sh"
-  source "/usr/share/blackbox/func/telegram.sh"
-  source "/usr/share/blackbox/func/valid_ip.sh"
-  source "/usr/share/blackbox/func/find_ip4_information.sh"
-else
-  echo "/usr/share/blackbox/func/devicelog.sh DOES NOT Exist  ">>/boot/log.txt
-  source "/boot/installsrc/usr/share/blackbox/func/devicelog.sh"
-  source "/boot/installsrc/usr/share/blackbox/func/telegram.sh"
-  source "/boot/installsrc/usr/share/blackbox/func/valid_ip.sh"
-  source "/boot/installsrc/usr/share/blackbox/func/find_ip4_information.sh"
-fi
 
 
 

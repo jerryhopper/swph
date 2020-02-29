@@ -8,12 +8,23 @@ echo "automation_custom_prescript has started">/boot/log.txt
 
 if [ -f "/etc/blackbox/blackbox.conf" ]; then
   source "/etc/blackbox/blackbox.conf"
+  echo "1" > $BB_STATE
+
   echo "bbstate=$BB_STATE">>/boot/log.txt
   echo "bbjson=$BB_JSON">>/boot/log.txt
-#
 else
+  echo "0" > $BB_STATE
   echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
 fi
+
+exit 0
+
+
+
+
+
+
+
 
 #echo "0" > $BB_STATE
 
@@ -26,13 +37,13 @@ fi
 # - Copy your script to /boot/Automation_Custom_PreScript.sh and it will be executed automatically.
 # - Executed script log: /var/tmp/dietpi/logs/dietpi-automation_custom_prescript.log
 
-#if [ -f "$BB_JSON" ]; then
-#  # run hardware detection and create hardware.json & hardware.hash
-#  echo "automation_custom_prescript: running 1_hardwaredetect.sh">>/boot/log.txt
-#  bash /usr/share/blackbox/1_hardwaredetect.sh
-#else
-#  echo "BB_JSON=$BB_JSON">>/boot/log.txt
-#fi
+if [ -f "$BB_JSON" ]; then
+  # run hardware detection and create hardware.json & hardware.hash
+  echo "automation_custom_prescript: running 1_hardwaredetect.sh">>/boot/log.txt
+  bash /boot/installsrc/usr/share/blackbox/1_hardwaredetect.sh
+else
+  echo "BB_JSON=$BB_JSON">>/boot/log.txt
+fi
 # delete if devmode is disabled.
 #if [[ $DEVMODE = 0 ]]; then
     # after the hardwaretest, remove the script.
@@ -43,6 +54,6 @@ fi
 
 #fi
 
-#echo "automation_custom_prescript has ended">>/boot/log.txt
+echo "automation_custom_prescript has ended">>/boot/log.txt
 #echo "1" >> $BB_STATE
 

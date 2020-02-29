@@ -1,3 +1,59 @@
 #!/bin/bash
 
-echo "yep"
+
+
+includeSources(){
+    source "/usr/share/blackbox/func/devicelog.sh"
+    source "/usr/share/blackbox/func/telegram.sh"
+    source "/usr/share/blackbox/func/valid_ip.sh"
+    source "/usr/share/blackbox/func/find_ip4_information.sh"
+}
+
+#echo "1=$1 2=$2 3=$3"
+
+if [ "$1" == "" ]; then
+  echo "blackbox"
+  echo "Usage: blackbox [option] "
+  echo "Options : install, configure, check "
+  exit 0
+fi
+
+# load installlstate in variable
+if [ -f "$BB_STATE" ]; then
+    INSTALLSTATE=$(<$BB_STATE)
+fi
+
+# load blackbox.conf
+if [ -f "/etc/blackbox/blackbox.conf" ]; then
+  source "/etc/blackbox/blackbox.conf"
+  echo "bbstate=$BB_STATE">>/boot/log.txt
+  echo "bbjson=$BB_JSON">>/boot/log.txt
+else
+  echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
+  exit 1
+fi
+
+
+if [ "$1" == "check"]; then
+    # check installstate, if installstate == 0, copy files.
+    if [ "$INSTALLSTATE" == "1" ]; then
+        cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
+        echo "2">$BB_STATE
+    fi
+    INSTALLSTATE=$(<$BB_STATE)
+    if [ "$INSTALLSTATE" == "2" ]; then
+        #cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
+        includeSources
+        echo "3">$BB_STATE
+    fi
+
+fi
+
+if [ "$1" == "install" ]; then
+
+fi
+
+if [ "$1" == "configure" ]; then
+
+fi
+
