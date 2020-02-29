@@ -12,8 +12,7 @@ SCRIPT_FILENAME="Automation_Custom_Script"
 #  /usr/lib/blackbox    Executable
 #  /usr/sbin/blackbox   Executable
 #  /usr/share/blackbox/ Dir with libraries
-#
-
+# 
 echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 # Custom Script (post-networking and post-DietPi install)
 # - Allows you to automatically execute a custom script at the end of DietPi install.
