@@ -4,6 +4,7 @@
 # instead of continuing the installation with something broken
 set -e
 
+exit 0
 SCRIPT_FILENAME="Automation_Custom_Script"
 
 #
