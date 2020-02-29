@@ -26,10 +26,24 @@ source "/etc/blackbox/blackbox.conf"
 echo "2" > $BB_STATE
 
 echo "Automation_Custom_Script.sh A ">>/boot/log.txt
-source "/usr/share/blackbox/func/devicelog.sh"
-source "/usr/share/blackbox/func/telegram.sh"
-source "/usr/share/blackbox/func/valid_ip.sh"
-source "/usr/share/blackbox/func/find_ip4_information.sh"
+
+if [ -f "/usr/share/blackbox/func/devicelog.sh" ]; then
+  source "/usr/share/blackbox/func/devicelog.sh"
+  source "/usr/share/blackbox/func/telegram.sh"
+  source "/usr/share/blackbox/func/valid_ip.sh"
+  source "/usr/share/blackbox/func/find_ip4_information.sh"
+else
+  source "/boot/installsrc/usr/share/blackbox/func/devicelog.sh"
+  source "/boot/installsrc/usr/share/blackbox/func/telegram.sh"
+  source "/boot/installsrc/usr/share/blackbox/func/valid_ip.sh"
+  source "/boot/installsrc/usr/share/blackbox/func/find_ip4_information.sh"
+fi
+
+
+
+
+
+
 
 echo "Automation_Custom_Script.sh B ">>/boot/log.txt
 
