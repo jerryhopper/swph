@@ -6,8 +6,10 @@ set -e
 
 if [ ! -f "/usr/share/sbin/blackbox" ]; then
   # no blackbox binary found, installing.
-  cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
-  chmod +x /usr/sbin/blackbox
+  # cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
+  ln -s /boot/installsrc/usr/sbin/blackbox /usr/sbin
+  #chmod +x /usr/sbin/blackbox
+  chmod +x /boot/installsrc/usr/sbin/blackbox
 fi
 
 
