@@ -17,7 +17,7 @@ fi
 
 echo "0" > $BB_STATE
 
-cp -v -f /boot/installsrc/usr/share/blackbox /usr/share
+cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
 cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
 
 # Custom Script (pre-networking and pre-DietPi install)
