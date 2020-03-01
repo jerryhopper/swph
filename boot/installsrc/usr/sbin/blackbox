@@ -384,6 +384,7 @@ if [ "$1" == "check" ]; then
         find_IPv4_information
         piholesetupvarsconf
         piholeftlconf
+        piholeadlists
         echo "7">$BB_STATE
         INSTALLSTATE=7
     fi
