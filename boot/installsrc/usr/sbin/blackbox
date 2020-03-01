@@ -320,7 +320,7 @@ fi
 
 if [ "$1" == "check" ]; then
 
-    telegram "INSTALLSTATE=$INSTALLSTATE"
+    
     # check installstate, if installstate == 0, copy files.
     if [ "$INSTALLSTATE" == "1" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
