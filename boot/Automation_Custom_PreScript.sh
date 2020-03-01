@@ -23,7 +23,7 @@ generate_post_data()
   CPA=$(cat /proc/cpuinfo |grep -m 1 "CPU architecture"|cut -d' ' -f 3)
   CPR=$(cat /proc/cpuinfo |grep -m 1 "CPU revision"|cut -d' ' -f 3)
   DTE=$(date)
-  cat <<EOF
+  POSTDATA = cat <<EOF
 {"MID":"$MID","MAC":"$MAC","MEA":"$MEA","MEU":"$MEU","SDS":"$SDS","FPU":"$FPU","FSU":"$FSU","CPH":"$CPH","CPI":"$CPI","CPP":"$CPP","CPA":"$CPA","DTE":"$DTE","CPR":"$CPR"}
 EOF
 }
@@ -32,11 +32,11 @@ echo "automation_custom_prescript has started">/boot/log.txt
 
 if [ -f "/etc/blackbox/blackbox.conf" ]; then
   source "/etc/blackbox/blackbox.conf"
-  echo $(generate_post_data) >/etc/blackbox/hardware.json
+  echo "$POSTDATA">/etc/blackbox/hardware.json
   echo $(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2) >/etc/blackbox/blackbox.id
-  echo "1" > $BB_STATE
+  echo "1" > /etc/blackbox/blackbox.state
 else
-  echo "0" > $BB_STATE
+  echo "0" > /etc/blackbox/blackbox.state
   echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
 fi
 
