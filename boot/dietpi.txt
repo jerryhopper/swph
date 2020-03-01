@@ -106,6 +106,8 @@ AUTO_SETUP_GLOBAL_PASSWORD=dietpi
 # - E.g. the following (without the leading "#") will install the LXDE desktop automatically on first boot:
 # AUTO_SETUP_INSTALL_SOFTWARE_ID=84
 # -AUTO_SETUP_INSTALL_SOFTWARE_ID=93
+AUTO_SETUP_INSTALL_SOFTWARE_ID=81
+AUTO_SETUP_INSTALL_SOFTWARE_ID=17
 
 #Automated installs (0 = normal, 1 = dp-core , 2 = grasshopper, 3 = Pi-hole )
 #AUTO_Install_Index=3
