@@ -320,7 +320,7 @@ fi
 
 if [ "$1" == "check" ]; then
 
-    
+
     # check installstate, if installstate == 0, copy files.
     if [ "$INSTALLSTATE" == "1" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
@@ -344,18 +344,18 @@ if [ "$1" == "check" ]; then
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "3" ]; then
-        if ! is_command "git"; then
-            /boot/dietpi/dietpi-software install 81 17 --unattended
-        else
-            echo "4">$BB_STATE
-            INSTALLSTATE=4
-        fi
+        #if ! is_command "git"; then
+        #    /boot/dietpi/dietpi-software install 81 17 --unattended
+        #else
+        echo "4">$BB_STATE
+        INSTALLSTATE=4
+        #fi
     fi
 
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "4" ]; then
-        apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
+        apt-get -y install git lighttpd php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
         echo "5">$BB_STATE
         INSTALLSTATE=5
     fi
