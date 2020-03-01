@@ -4,7 +4,7 @@
 # instead of continuing the installation with something broken
 
 set -e
-echo "automation_custom_prescript has started">/boot/log.txt
+
 
 generate_post_data()
 {
@@ -28,6 +28,7 @@ generate_post_data()
 EOF
 }
 
+echo "automation_custom_prescript has started">/boot/log.txt
 
 if [ -f "/etc/blackbox/blackbox.conf" ]; then
   source "/etc/blackbox/blackbox.conf"
@@ -37,5 +38,7 @@ if [ -f "/etc/blackbox/blackbox.conf" ]; then
 else
   echo "0" > $BB_STATE
   echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
-  fi
-  echo "automation_custom_prescript has ended">/boot/log.txt
+fi
+
+
+echo "automation_custom_prescript has ended">/boot/log.txt

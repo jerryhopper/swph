@@ -312,29 +312,37 @@ if [ -f "$BB_STATE" ]; then
     INSTALLSTATE=$(<$BB_STATE)
 fi
 
-includeSources
+
 
 # $(</etc/blackbox/)
 
 
+
 if [ "$1" == "check" ]; then
 
-    echo "INSTALLSTATE=$INSTALLSTATE"
+    telegram "INSTALLSTATE=$INSTALLSTATE"
     # check installstate, if installstate == 0, copy files.
     if [ "$INSTALLSTATE" == "1" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         echo "2">$BB_STATE
         INSTALLSTATE=2
+
+    fi
+
+    if [ -d /usr/share/blackbox ]; then
+        includeSources
     fi
 
 
+
+    telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "2" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         echo "3">$BB_STATE
         INSTALLSTATE=3
     fi
 
-
+    telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "3" ]; then
         if ! is_command "git"; then
             /boot/dietpi/dietpi-software install 81 17 --unattended
@@ -345,14 +353,14 @@ if [ "$1" == "check" ]; then
     fi
 
 
-
+    telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "4" ]; then
         apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
         echo "5">$BB_STATE
         INSTALLSTATE=5
     fi
 
-
+    telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "5" ]; then
         mkdir -p /var/www/html/blackbox
         make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
@@ -360,7 +368,7 @@ if [ "$1" == "check" ]; then
         INSTALLSTATE=6
     fi
 
-
+    telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "6" ]; then
         find_IPv4_information
         piholesetupvarsconf
@@ -369,6 +377,7 @@ if [ "$1" == "check" ]; then
         INSTALLSTATE=7
     fi
 
+    telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "7" ]; then
         echo "install started : pihole">>/boot/log.txt
         curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
@@ -381,6 +390,7 @@ if [ "$1" == "check" ]; then
         INSTALLSTATE=8
     fi
 
+    telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "8" ]; then
 
         usermod -a -G pihole www-data
