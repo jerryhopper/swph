@@ -274,6 +274,8 @@ if [ -f "$BB_STATE" ]; then
     INSTALLSTATE=$(<$BB_STATE)
 fi
 
+includeSources
+
 # $(</etc/blackbox/)
 
 
@@ -287,68 +289,59 @@ if [ "$1" == "check" ]; then
         INSTALLSTATE=2
     fi
 
+
     if [ "$INSTALLSTATE" == "2" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
-        includeSources
         echo "3">$BB_STATE
         INSTALLSTATE=3
     fi
 
-    if [ "$INSTALLSTATE" == "3" ]; then
 
+    if [ "$INSTALLSTATE" == "3" ]; then
         if ! is_command "git"; then
-            /boot/dietpi/dietpi-software install 17 --unattended
+            /boot/dietpi/dietpi-software install 81 17 --unattended
         else
             echo "4">$BB_STATE
             INSTALLSTATE=4
         fi
     fi
 
-    if [ "$INSTALLSTATE" == "4" ];then
-        if ! is_command "lighttpd"; then
-            /boot/dietpi/dietpi-software install 81 --unattended
-        else
-            echo "5">$BB_STATE
-            INSTALLSTATE=5
-        fi
+
+
+    if [ "$INSTALLSTATE" == "4" ]; then
+        apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
+        echo "5">$BB_STATE
+        INSTALLSTATE=5
     fi
 
+
     if [ "$INSTALLSTATE" == "5" ]; then
-        apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
+        mkdir -p /var/www/html/blackbox
+        make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
         echo "6">$BB_STATE
         INSTALLSTATE=6
     fi
 
 
     if [ "$INSTALLSTATE" == "6" ]; then
-        mkdir -p /var/www/html/blackbox
-        make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
+        find_IPv4_information
+        piholesetupvarsconf
+        piholeftlconf
         echo "7">$BB_STATE
         INSTALLSTATE=7
     fi
 
-
     if [ "$INSTALLSTATE" == "7" ]; then
-        find_IPv4_information
-        piholesetupvarsconf
-        piholeftlconf
-
-        #/boot/dietpi/dietpi-software install 81 --unattended
+        echo "install started : pihole">>/boot/log.txt
+        #curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
+        curl -L https://raw.githubusercontent.com/jerryhopper/pi-hole/master/automated%20install/basic-install.sh  | bash /dev/stdin --unattended
+        #telegram "install finished : pihole"
+        echo "install finished : pihole">>/boot/log.txt
         echo "8">$BB_STATE
         INSTALLSTATE=8
     fi
 
     if [ "$INSTALLSTATE" == "8" ]; then
-            echo "install started : pihole">>/boot/log.txt
-            #curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
-            curl -L https://raw.githubusercontent.com/jerryhopper/pi-hole/master/automated%20install/basic-install.sh  | bash /dev/stdin --unattended
-            #telegram "install finished : pihole"
-            echo "install finished : pihole">>/boot/log.txt
-        echo "9">$BB_STATE
-        INSTALLSTATE=9
-    fi
-
-    if [ "$INSTALLSTATE" == "9" ]; then
 
         usermod -a -G pihole www-data
 
@@ -368,8 +361,8 @@ if [ "$1" == "check" ]; then
         sed -i -e 's/pihole\/index.php/blackbox\/index.php/g' /etc/lighttpd/lighttpd.conf
 
 
-        echo "10">$BB_STATE
-        INSTALLSTATE=10
+        echo "9">$BB_STATE
+        INSTALLSTATE=9
     fi
 
 
