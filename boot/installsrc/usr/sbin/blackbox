@@ -276,7 +276,7 @@ includeSources(){
 
 setstate(){
    echo "$1" > $BB_STATE
-   local INSTALLSTATE=$1
+   local INSTALLSTATE="$1"
 }
 
 
