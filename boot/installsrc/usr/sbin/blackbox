@@ -87,6 +87,7 @@ piholeadlists(){
     echo "https://blocklists.surfwijzer.nl/category/proxy/$BID">>/etc/pihole/adlists.list
     echo "https://blocklists.surfwijzer.nl/category/advertising/$BID">>/etc/pihole/adlists.list
     echo "https://blocklists.surfwijzer.nl/category/malware/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/suspicious/$BID">>/etc/pihole/adlists.list
     echo "https://blocklists.surfwijzer.nl/category/group1/$BID">>/etc/pihole/adlists.list
     echo "https://blocklists.surfwijzer.nl/category/group2/$BID">>/etc/pihole/adlists.list
     echo "https://blocklists.surfwijzer.nl/category/group3/$BID">>/etc/pihole/adlists.list
@@ -274,10 +275,6 @@ includeSources(){
     source "/usr/share/blackbox/func/find_ip4_information.sh"
 }
 
-setstate(){
-   echo "$1" > $BB_STATE
-   local INSTALLSTATE="$1"
-}
 
 
 
@@ -378,7 +375,8 @@ install(){
     # check installstate, if installstate == 0, copy files.
     if [ "$INSTALLSTATE" == "1" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
-        setstate "2"
+        echo "2" > $BB_STATE
+        INSTALLSTATE=2
     fi
 
     if [ -d /usr/share/blackbox ]; then
@@ -390,7 +388,8 @@ install(){
     telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "2" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
-        setstate "3"
+        echo "3" > $BB_STATE
+        INSTALLSTATE=3
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
@@ -398,8 +397,9 @@ install(){
         #if ! is_command "git"; then
         #    /boot/dietpi/dietpi-software install 81 17 --unattended
         #else
-        echo "4">$BB_STATE
-        setstate "4"
+        #echo "4">$BB_STATE
+        echo "4" > $BB_STATE
+        INSTALLSTATE=4
         #fi
     fi
 
@@ -408,14 +408,16 @@ install(){
     if [ "$INSTALLSTATE" == "4" ]; then
         # git lighttpd
         apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
-        setstate "5"
+        echo "5" > $BB_STATE
+        INSTALLSTATE=5
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "5" ]; then
         mkdir -p /var/www/html/blackbox
         make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
-        setstate "6"
+        echo "6" > $BB_STATE
+        INSTALLSTATE=6
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
@@ -424,7 +426,8 @@ install(){
         piholesetupvarsconf
         piholeftlconf
         piholeadlists
-        setstate "7"
+        echo "7" > $BB_STATE
+        INSTALLSTATE=7
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
@@ -436,7 +439,8 @@ install(){
 
         #telegram "install finished : pihole"
         echo "install finished : pihole">>/boot/log.txt
-        setstate "8"
+        echo "8" > $BB_STATE
+        INSTALLSTATE=8
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
@@ -461,7 +465,8 @@ install(){
 
         createpostboot
 
-        setstate "9"
+        echo "9" > $BB_STATE
+        INSTALLSTATE=9
 
         reboot
     fi
