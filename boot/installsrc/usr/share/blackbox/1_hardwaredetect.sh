@@ -21,5 +21,40 @@ echo "1_hardwaredetect.sh has started">>/boot/log.txt
 # It's still a work in progress, so you may see some variance in this guideline until it is complete
 
 
-$(</etc/blackbox/blackbox.id)
+
+
+
+
+generate_post_data()
+{
+  ### GET DEVICE/SETUP SPECIFIC VALUES ###
+  MID=$(cat /etc/machine-id)
+  MAC=$(ip addr show eth0|grep "ether"|cut -d' ' -f 6)
+  MEMALL=$(cat /proc/meminfo|grep -m 1 "MemTotal"|cut -d' ' -f 2-);
+  MEA=$(echo $MEMALL|cut -d' ' -f 1)
+  MEU=$(echo $MEMALL|cut -d' ' -f 2)
+  SDS=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_SERIAL|cut -d'=' -f 2)
+  FPU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_PART_TABLE_UUID|cut -d'=' -f 2)
+  FSU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep -m 1 ID_FS_UUID|cut -d'=' -f 2)
+  CPH=$(cat /proc/cpuinfo |grep -m 1 "Hardware"|cut -d' ' -f 2)
+  CPI=$(cat /proc/cpuinfo |grep -m 1 "CPU implementer"|cut -d' ' -f 3)
+  CPP=$(cat /proc/cpuinfo |grep -m 1 "Processor"|cut -d' ' -f 2-6)
+  CPA=$(cat /proc/cpuinfo |grep -m 1 "CPU architecture"|cut -d' ' -f 3)
+  CPR=$(cat /proc/cpuinfo |grep -m 1 "CPU revision"|cut -d' ' -f 3)
+  DTE=$(date)
+  cat <<EOF
+{"MID":"$MID","MAC":"$MAC","MEA":"$MEA","MEU":"$MEU","SDS":"$SDS","FPU":"$FPU","FSU":"$FSU","CPH":"$CPH","CPI":"$CPI","CPP":"$CPP","CPA":"$CPA","DTE":"$DTE","CPR":"$CPR"}
+EOF
+}
+
+
+mkdir -p /etc/blackbox/
+### CREATE JSON ###
+POSTDATA=$(generate_post_data)
+### CREATE HASH OF THE JSON
+HARDWAREHASH=$(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)
+
+
+echo $(generate_post_data)>/etc/blackbox/hardware.json
+echo $(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)/etc/blackbox/blackbox.id
 

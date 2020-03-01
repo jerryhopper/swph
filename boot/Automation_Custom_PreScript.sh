@@ -2,9 +2,9 @@
 # -e option instructs bash to immediately exit if any command [1] has a non-zero exit status
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
+
 set -e
 echo "automation_custom_prescript has started">/boot/log.txt
-
 
 generate_post_data()
 {
@@ -31,11 +31,11 @@ EOF
 
 if [ -f "/etc/blackbox/blackbox.conf" ]; then
   source "/etc/blackbox/blackbox.conf"
-  echo $(generate_post_data)>/etc/blackbox/hardware.json
-  echo $(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)/etc/blackbox/blackbox.id
+  echo $(generate_post_data) >/etc/blackbox/hardware.json
+  echo $(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2) >/etc/blackbox/blackbox.id
   echo "1" > $BB_STATE
 else
   echo "0" > $BB_STATE
   echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
-fi
-echo "automation_custom_prescript has ended">/boot/log.txt
+  fi
+  echo "automation_custom_prescript has ended">/boot/log.txt

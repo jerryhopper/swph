@@ -30,6 +30,28 @@ valid_ip() {
     return ${stat}
 }
 
+generate_post_data()
+{
+  ### GET DEVICE/SETUP SPECIFIC VALUES ###
+  MID=$(cat /etc/machine-id)
+  MAC=$(ip addr show eth0|grep "ether"|cut -d' ' -f 6)
+  MEMALL=$(cat /proc/meminfo|grep -m 1 "MemTotal"|cut -d' ' -f 2-);
+  MEA=$(echo $MEMALL|cut -d' ' -f 1)
+  MEU=$(echo $MEMALL|cut -d' ' -f 2)
+  SDS=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_SERIAL|cut -d'=' -f 2)
+  FPU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_PART_TABLE_UUID|cut -d'=' -f 2)
+  FSU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep -m 1 ID_FS_UUID|cut -d'=' -f 2)
+  CPH=$(cat /proc/cpuinfo |grep -m 1 "Hardware"|cut -d' ' -f 2)
+  CPI=$(cat /proc/cpuinfo |grep -m 1 "CPU implementer"|cut -d' ' -f 3)
+  CPP=$(cat /proc/cpuinfo |grep -m 1 "Processor"|cut -d' ' -f 2-6)
+  CPA=$(cat /proc/cpuinfo |grep -m 1 "CPU architecture"|cut -d' ' -f 3)
+  CPR=$(cat /proc/cpuinfo |grep -m 1 "CPU revision"|cut -d' ' -f 3)
+  DTE=$(date)
+  cat <<EOF
+{"MID":"$MID","MAC":"$MAC","MEA":"$MEA","MEU":"$MEU","SDS":"$SDS","FPU":"$FPU","FSU":"$FSU","CPH":"$CPH","CPI":"$CPI","CPP":"$CPP","CPA":"$CPA","DTE":"$DTE","CPR":"$CPR"}
+EOF
+}
+
 
 find_IPv4_information() {
     # Detects IPv4 address used for communication to WAN addresses.
@@ -240,6 +262,9 @@ includeSources(){
 }
 
 
+
+
+
 SCRIPT_FILENAME="blackbox"
 INSTALLSTATE=none
 
@@ -254,6 +279,7 @@ if [ "$1" == "" ]; then
   exit 0
 fi
 
+
 # load blackbox.conf
 if [ -f "/etc/blackbox/blackbox.conf" ]; then
   source "/etc/blackbox/blackbox.conf"
@@ -264,8 +290,20 @@ else
   exit 1
 fi
 
+
+
 if [ -f "$BB_HASH" ]; then
-  BID=$(<$BB_HASH)
+    BID=$(<$BB_HASH)
+else
+    if [ -f "/etc/blackbox/blackbox.conf" ]; then
+      echo $(generate_post_data)>/etc/blackbox/hardware.json
+      echo $(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)/etc/blackbox/blackbox.id
+      echo "1" > $BB_STATE
+    else
+      echo "0" > $BB_STATE
+      echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
+    fi
+
 fi
 
 
@@ -333,8 +371,10 @@ if [ "$1" == "check" ]; then
 
     if [ "$INSTALLSTATE" == "7" ]; then
         echo "install started : pihole">>/boot/log.txt
-        #curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
-        curl -L https://raw.githubusercontent.com/jerryhopper/pi-hole/master/automated%20install/basic-install.sh  | bash /dev/stdin --unattended
+        curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
+        #curl -L https://raw.githubusercontent.com/jerryhopper/pi-hole/master/automated%20install/basic-install.sh  | bash /dev/stdin --unattended
+        #curl -L https://github.com/jerryhopper/pi-hole/blob/release/v5.0/automated%20install/basic-install.sh  | bash /dev/stdin --unattended
+
         #telegram "install finished : pihole"
         echo "install finished : pihole">>/boot/log.txt
         echo "8">$BB_STATE
@@ -377,3 +417,6 @@ if [ "$1" == "configure" ]; then
     echo "INSTALLSTATE=$INSTALLSTATE"
 fi
 
+if [ "$1" == "reset" ]; then
+    echo "1">/etc/blackbox/blackbox.state
+fi
