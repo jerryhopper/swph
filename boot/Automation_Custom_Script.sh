@@ -4,6 +4,10 @@
 # instead of continuing the installation with something broken
 set -e
 
+SCRIPT_FILENAME="Automation_Custom_Script"
+
+echo "Automation_Custom_Script.sh has started">>/boot/log.txt
+
 if [ ! -f "/usr/share/sbin/blackbox" ]; then
   # no blackbox binary found, installing.
   # cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
@@ -13,13 +17,21 @@ if [ ! -f "/usr/share/sbin/blackbox" ]; then
 fi
 
 
-/usr/sbin/blackbox check
+/usr/sbin/blackbox install
 
-
-
+echo "Automation_Custom_Script.sh has ended">>/boot/log.txt
 
 exit 0
-SCRIPT_FILENAME="Automation_Custom_Script"
+
+
+
+
+
+
+
+
+
+
 
 #
 #  /etc/blackbox/ dir with options.
@@ -28,7 +40,7 @@ SCRIPT_FILENAME="Automation_Custom_Script"
 #  /usr/sbin/blackbox   Executable
 #  /usr/share/blackbox/ Dir with libraries
 #
-echo "Automation_Custom_Script.sh has started">>/boot/log.txt
+
 # Custom Script (post-networking and post-DietPi install)
 # - Allows you to automatically execute a custom script at the end of DietPi install.
 # - Option 0 = Copy your script to /boot/Automation_Custom_Script.sh and it will be executed automatically.
@@ -97,7 +109,7 @@ devicelog "info,$BBID,$IPV4_ADDRESS"
 #  /var/tmp/dietpi/logs/dietpi-automation_custom_script.log
 
 #devicelog "Automation_Custom_Script.sh end."
-echo "Automation_Custom_Script.sh has ended">>/boot/log.txt
+
 
 
 exit 0

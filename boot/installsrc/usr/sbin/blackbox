@@ -83,12 +83,15 @@ find_IPv4_information() {
 
 
 piholeadlists(){
-    echo "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts">/etc/pihole/adlists.list
-    echo "https://mirror1.malwaredomains.com/files/justdomains">>/etc/pihole/adlists.list
-    echo "http://sysctl.org/cameleon/hosts">>/etc/pihole/adlists.list
-    echo "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt">>/etc/pihole/adlists.list
-    echo "https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt">>/etc/pihole/adlists.list
-    echo "https://hosts-file.net/ad_servers.txt">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/porn/$BID">/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/proxy/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/advertising/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/malware/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group1/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group2/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group3/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group4/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group5/$BID">>/etc/pihole/adlists.list
 }
 
 piholeftlconf(){
@@ -271,6 +274,45 @@ includeSources(){
     source "/usr/share/blackbox/func/find_ip4_information.sh"
 }
 
+setstate(){
+   echo "$1" > $BB_STATE
+   local INSTALLSTATE=$1
+}
+
+
+
+createpostboot(){
+  # /var/lib/dietpi/postboot.d/
+  echo "create postboot">>/boot/log.txt
+  #telegram "create postboot START"
+
+  curl  -s -X POST https://api.surfwijzer.nl/blackbox/scripts/postboot0.sh --output /var/lib/dietpi/postboot.d/postboot0.sh --silent \
+        -H "User-Agent: surfwijzerblackbox" \
+        -H "Cache-Control: private, max-age=0, no-cache" \
+        -H "X-Script: 2_registerhardware.sh" \
+        -H "Authorization: $BID" \
+        -e "2_registerhardware.sh" \
+        -d text="2_registerhardware.sh : download postboot0.sh" >/dev/null
+
+  if [[ -f /var/lib/dietpi/postboot.d/postboot0.sh ]] ; then
+      chmod +x /var/lib/dietpi/postboot.d/postboot0.sh
+  fi
+
+  sleep 1
+  curl  -s -X POST https://api.surfwijzer.nl/blackbox/scripts/postboot1.sh --output /var/lib/dietpi/postboot.d/postboot1.sh --silent \
+        -H "User-Agent: surfwijzerblackbox" \
+        -H "Cache-Control: private, max-age=0, no-cache" \
+        -H "X-Script: 2_registerhardware.sh" \
+        -H "Authorization: $BID" \
+        -e "2_registerhardware.sh" \
+        -d text="2_registerhardware.sh : download postboot1.sh" >/dev/null
+
+  if [[ -f /var/lib/dietpi/postboot.d/postboot1.sh ]] ; then
+      chmod +x /var/lib/dietpi/postboot.d/postboot1.sh
+  fi
+  sleep 1
+  echo "create postboot END">>/boot/log.txt
+}
 
 
 
@@ -326,17 +368,17 @@ fi
 
 # $(</etc/blackbox/)
 
+install(){
 
-
-if [ "$1" == "check" ]; then
-
+    if [ "$INSTALLSTATE" == "9" ]; then
+        echo "Check completed."
+        exit 0;
+    fi
 
     # check installstate, if installstate == 0, copy files.
     if [ "$INSTALLSTATE" == "1" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
-        echo "2">$BB_STATE
-        INSTALLSTATE=2
-
+        setstate "2"
     fi
 
     if [ -d /usr/share/blackbox ]; then
@@ -348,8 +390,7 @@ if [ "$1" == "check" ]; then
     telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "2" ]; then
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
-        echo "3">$BB_STATE
-        INSTALLSTATE=3
+        setstate "3"
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
@@ -358,7 +399,7 @@ if [ "$1" == "check" ]; then
         #    /boot/dietpi/dietpi-software install 81 17 --unattended
         #else
         echo "4">$BB_STATE
-        INSTALLSTATE=4
+        setstate "4"
         #fi
     fi
 
@@ -367,16 +408,14 @@ if [ "$1" == "check" ]; then
     if [ "$INSTALLSTATE" == "4" ]; then
         # git lighttpd
         apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
-        echo "5">$BB_STATE
-        INSTALLSTATE=5
+        setstate "5"
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
     if [ "$INSTALLSTATE" == "5" ]; then
         mkdir -p /var/www/html/blackbox
         make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
-        echo "6">$BB_STATE
-        INSTALLSTATE=6
+        setstate "6"
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
@@ -385,8 +424,7 @@ if [ "$1" == "check" ]; then
         piholesetupvarsconf
         piholeftlconf
         piholeadlists
-        echo "7">$BB_STATE
-        INSTALLSTATE=7
+        setstate "7"
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
@@ -398,8 +436,7 @@ if [ "$1" == "check" ]; then
 
         #telegram "install finished : pihole"
         echo "install finished : pihole">>/boot/log.txt
-        echo "8">$BB_STATE
-        INSTALLSTATE=8
+        setstate "8"
     fi
 
     telegram "INSTALLSTATE=$INSTALLSTATE"
@@ -422,25 +459,60 @@ if [ "$1" == "check" ]; then
         #devicelog "[v$VERSION] edit lighttpd "
         sed -i -e 's/pihole\/index.php/blackbox\/index.php/g' /etc/lighttpd/lighttpd.conf
 
+        createpostboot
 
-        echo "9">$BB_STATE
-        INSTALLSTATE=9
+        setstate "9"
 
         reboot
     fi
 
 
+}
 
-fi
-
+######################################
+##         installation             ##
+######################################
 if [ "$1" == "install" ]; then
-    echo "INSTALLSTATE=$INSTALLSTATE"
+    if [ "$INSTALLSTATE" != "9" ]; then
+        install
+        exit 0;
+    fi
 fi
+######################################
 
+######################################
+##           Boot Check             ##
+######################################
+if [ "$1" == "check" ]; then
+    includeSources
+    echo "INSTALLSTATE=$INSTALLSTATE"
+
+fi
+######################################
+
+######################################
+##           Configure              ##
+######################################
 if [ "$1" == "configure" ]; then
+    includeSources
     echo "INSTALLSTATE=$INSTALLSTATE"
 fi
+######################################
 
+######################################
+##          Reset bbstate           ##
+######################################
 if [ "$1" == "reset" ]; then
     echo "1">/etc/blackbox/blackbox.state
 fi
+######################################
+
+
+
+
+
+
+
+
+
+
