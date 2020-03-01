@@ -81,6 +81,16 @@ find_IPv4_information() {
     IPV4_ADDRESS=$(ip -oneline -family inet address show | grep "${IPv4bare}/" |  awk '{print $4}' | awk 'END {print}')
 }
 
+
+piholeadlists(){
+    echo "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts">/etc/pihole/adlists.list
+    echo "https://mirror1.malwaredomains.com/files/justdomains">>/etc/pihole/adlists.list
+    echo "http://sysctl.org/cameleon/hosts">>/etc/pihole/adlists.list
+    echo "https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt">>/etc/pihole/adlists.list
+    echo "https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt">>/etc/pihole/adlists.list
+    echo "https://hosts-file.net/ad_servers.txt">>/etc/pihole/adlists.list
+}
+
 piholeftlconf(){
   echo "PRIVACYLEVEL=0" >/etc/pihole/pihole-FTL.conf
   echo "BLOCKINGMODE=IP-NODATA-AAAA" >>/etc/pihole/pihole-FTL.conf
@@ -414,6 +424,8 @@ if [ "$1" == "check" ]; then
 
         echo "9">$BB_STATE
         INSTALLSTATE=9
+
+        reboot
     fi
 
 
