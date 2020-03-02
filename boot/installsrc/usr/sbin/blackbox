@@ -537,7 +537,7 @@ install(){
         echo "9" > $BB_STATE
         INSTALLSTATE=9
         telegram "INSTALLSTATE=$INSTALLSTATE"
-        reboot
+        #reboot
     fi
 
 }
