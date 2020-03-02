@@ -8,16 +8,33 @@ SCRIPT_FILENAME="Automation_Custom_Script"
 
 echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 
-if [ ! -f "/usr/sbin/blackbox" ]; then
-  ln -s /boot/installsrc/usr/sbin/blackbox /usr/sbin
-  #cp -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
-  chmod +x /boot/installsrc/usr/sbin/blackbox
-fi
 
-/usr/sbin/blackbox install
+if [ -f "/etc/blackbox/blackbox.conf" ]; then
+  source "/etc/blackbox/blackbox.conf"
+  echo "/etc/blackbox/blackbox.conf exists">>/boot/log.txt
+  if [ ! -f "/usr/sbin/blackbox" ]; then
+    if [ "$DEVMODE" == "1"]; then
+      echo "Creating symbolic link /usr/sbin blackbox">>/boot/log.txt
+      ln -s /boot/installsrc/usr/sbin/blackbox /usr/sbin
+      chmod +x /boot/installsrc/usr/sbin/blackbox
+    else
+       echo "Installing /usr/sbin/blackbox">>/boot/log.txt
+       cp -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
+       chmod +x /usr/sbin/blackbox
+    fi
+
+  fi
+
+  echo "Running /usr/sbin/blackbox">>/boot/log.txt
+  /usr/sbin/blackbox install
+
+else
+  echo "/etc/blackbox/blackbox.conf doesnot exist ">>/boot/log.txt
+fi
 
 
 echo "Automation_Custom_Script.sh has ended">>/boot/log.txt
+
 exit 0
 
 
@@ -43,12 +60,7 @@ exit 0
 # - Option 0 = Copy your script to /boot/Automation_Custom_Script.sh and it will be executed automatically.
 # - Option 1 = Host your script online, then use e.g. AUTO_SETUP_CUSTOM_SCRIPT_EXEC=https://myweb.com/myscript.sh and it will be downloaded and executed automatically.
 # - Executed script log: /var/tmp/dietpi/logs/dietpi-automation_custom_script.log
-if [ -f "/etc/blackbox/blackbox.conf" ]; then
-  source "/etc/blackbox/blackbox.conf"
-  echo "/etc/blackbox/blackbox.conf exists">>/boot/log.txt
-else
-  echo "/etc/blackbox/blackbox.conf doesnot exist ">>/boot/log.txt
-fi
+
 
 echo "2" > $BB_STATE
 

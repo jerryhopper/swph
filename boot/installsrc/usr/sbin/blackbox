@@ -416,7 +416,9 @@ install(){
     fi
 
     # check installstate, if installstate == 0, copy files.
+
     if [ "$INSTALLSTATE" == "1" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Installing files in /usr/share/blackbox "
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         #cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         echo "2" > $BB_STATE
@@ -429,15 +431,16 @@ install(){
 
 
 
-    telegram "INSTALLSTATE=$INSTALLSTATE"
+    telegram "INSTALLSTATE=$INSTALLSTATE  "
     if [ "$INSTALLSTATE" == "2" ]; then
-        cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
+        #cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         echo "3" > $BB_STATE
         INSTALLSTATE=3
     fi
 
-    telegram "INSTALLSTATE=$INSTALLSTATE"
+
     if [ "$INSTALLSTATE" == "3" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE "
         #if ! is_command "git"; then
         #    /boot/dietpi/dietpi-software install 81 17 --unattended
         #else
@@ -448,24 +451,27 @@ install(){
     fi
 
 
-    telegram "INSTALLSTATE=$INSTALLSTATE"
+
     if [ "$INSTALLSTATE" == "4" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE apt-get install prerequisites"
         # git lighttpd
         apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
         echo "5" > $BB_STATE
         INSTALLSTATE=5
     fi
 
-    telegram "INSTALLSTATE=$INSTALLSTATE"
+
     if [ "$INSTALLSTATE" == "5" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Cloning blackbox.git"
         mkdir -p /var/www/html/blackbox
         make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
         echo "6" > $BB_STATE
         INSTALLSTATE=6
     fi
 
-    telegram "INSTALLSTATE=$INSTALLSTATE"
+
     if [ "$INSTALLSTATE" == "6" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Installing Pihole configs and blocklists"
         find_IPv4_information
         piholesetupvarsconf
         piholeftlconf
@@ -474,8 +480,9 @@ install(){
         INSTALLSTATE=7
     fi
 
-    telegram "INSTALLSTATE=$INSTALLSTATE"
+
     if [ "$INSTALLSTATE" == "7" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Installing Pi-Hole from official repository"
         echo "install started : pihole">>/boot/log.txt
         curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
         #curl -L https://raw.githubusercontent.com/jerryhopper/pi-hole/master/automated%20install/basic-install.sh  | bash /dev/stdin --unattended
@@ -487,19 +494,22 @@ install(){
         INSTALLSTATE=8
     fi
 
-    telegram "INSTALLSTATE=$INSTALLSTATE"
-    if [ "$INSTALLSTATE" == "8" ]; then
 
+    if [ "$INSTALLSTATE" == "8" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Finalizing installation."
         usermod -a -G pihole www-data
 
         if [ -f "/etc/pihole/ftlbranch" ] ; then
             if [ "$(</etc/pihole/ftlbranch)" != "release/v5.0" ]; then
+
                 # Set repo to V5 beta
                 echo "release/v5.0" | sudo tee /etc/pihole/ftlbranch
 
+                telegram "INSTALLSTATE=$INSTALLSTATE Checking out release/v5 CORE"
                 #devicelog "[v$VERSION] Checkout release/v5.0 CORE "
                 echo "yes"|pihole checkout core release/v5.0
 
+                telegram "INSTALLSTATE=$INSTALLSTATE Checking out release/v5 WEB"
                 #devicelog "[v$VERSION] Checkout release/v5.0 WEB "
                 echo "yes"|pihole checkout web release/v5.0
             fi
@@ -513,12 +523,15 @@ install(){
 
 
         #devicelog "[v$VERSION] Usermod "
-        usermod -a -G pihole www-data
 
+        usermod -a -G pihole www-data
         #devicelog "[v$VERSION] edit lighttpd "
         sed -i -e 's/pihole\/index.php/blackbox\/index.php/g' /etc/lighttpd/lighttpd.conf
         sed -i -e 's/\/var\/www/\/var\/www\/html/g' /etc/lighttpd/lighttpd.conf
 
+
+        telegram "INSTALLSTATE=$INSTALLSTATE create postboot"
+        
         createpostboot
 
         echo "9" > $BB_STATE
