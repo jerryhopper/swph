@@ -466,6 +466,7 @@ install(){
         mkdir -p /var/www/html/blackbox
         make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
         echo "6" > $BB_STATE
+        composer install -d /var/www/html/blackbox
         INSTALLSTATE=6
     fi
 
@@ -527,13 +528,14 @@ install(){
         usermod -a -G pihole www-data
         #devicelog "[v$VERSION] edit lighttpd "
         sed -i -e 's/pihole\/index.php/blackbox\/index.php/g' /etc/lighttpd/lighttpd.conf
-        sed -i -e 's/\/var\/www/\/var\/www\/html/g' /etc/lighttpd/lighttpd.conf
+        sed -i -e 's/"\/var\/www"/"\/var\/www\/html"/g' /etc/lighttpd/lighttpd.conf
 
 
         telegram "INSTALLSTATE=$INSTALLSTATE create postboot"
 
         createpostboot
 
+        service lighttpd restart
         echo "9" > $BB_STATE
         INSTALLSTATE=9
         telegram "INSTALLSTATE=$INSTALLSTATE"
