@@ -30,9 +30,7 @@ echo "automation_custom_prescript has started">/boot/log.txt
 
 if [ -f "/etc/blackbox/blackbox.conf" ]; then
   source "/etc/blackbox/blackbox.conf"
-  POSTDATA = cat <<EOF
-{"MID":"$MID","MAC":"$MAC","MEA":"$MEA","MEU":"$MEU","SDS":"$SDS","FPU":"$FPU","FSU":"$FSU","CPH":"$CPH","CPI":"$CPI","CPP":"$CPP","CPA":"$CPA","DTE":"$DTE","CPR":"$CPR"}
-EOF
+  POSTDATA='{"MID":"'"$MID"'","MAC":"'"$MAC"'","MEA":"'"$MEA"'","MEU":"'"$MEU"'","SDS":"'"$SDS"'","FPU":"'"$FPU"'","FSU":"'"$FSU"'","CPH":"'"$CPH"'","CPI":"'"$CPI"'","CPP":"'"$CPP"'","CPA":"'"$CPA"'","DTE":"'"$DTE"'","CPR":"'"$CPR"'"}'
   echo "$POSTDATA">/etc/blackbox/hardware.json
   echo $(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2) >/etc/blackbox/blackbox.id
   echo "1" > /etc/blackbox/blackbox.state
