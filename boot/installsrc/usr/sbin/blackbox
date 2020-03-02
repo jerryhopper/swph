@@ -277,6 +277,51 @@ includeSources(){
 
 
 
+sendhash()
+{
+  # post the hardware data to ur api backend.
+  # we send the hardware-hash as authorization header.
+  #POSTDATA=$(<$TMP_POSTDATA)
+  #HARDWAREHASH=$(<$TMP_POSTDATAHASH)
+
+  status_code=$(curl --write-out %{http_code} --silent --output /dev/null -i \
+  -H "User-Agent: surfwijzerblackbox" \
+  -H "Cache-Control: private, max-age=0, no-cache" \
+  -H "Accept: application/json" \
+  -H "X-Script: 2_registerhardware.sh" \
+  -H "Content-Type:application/json" \
+  -H "Authorization: $BID" \
+  -X POST --data "$(<$BB_JSON)" "https://api.surfwijzer.nl/blackbox/api/installation/$BID/$IPV4_ADDRESS")
+
+  # check if the post succeeds
+  if [[ "$status_code" -eq 200 ]] ; then
+    # unsuccessful attempt.
+    telegram "sendhash Ok (already registered!) : Status = $status_code"
+    #devicelog "sendhash Ok (already registered!) : Status = $status_code ($IPV4_ADDRESS)"
+    echo "sendhash Ok (already registered!)  : Status = $status_code ($IPV4_ADDRESS)" >>/boot/log.txt
+    #echo "sendhash Error : Status = $status_code">>/boot/log.txt
+    #echo "Site status changed to $status_code"
+    #echo "ERRORRRR do not activate."
+
+  elif [[ "$status_code" -eq 201  ]] ;then
+    telegram "sendhash ok : device registered ( $IPV4_ADDRESS) $BID"
+    #devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $BID"
+    echo "sendhash ok : device registered ($IPV4_ADDRESS) $BID" >>/boot/log.txt
+    #createpostboot
+    #echo "5" > $BB_STATE
+    # write the hash for later reference.
+    #mkdir -p /var/www
+    #echo  $HARDWAREHASH>$BB_HASHLOCATION
+
+  else
+
+    telegram "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"
+    #devicelog "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"
+    echo "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"  >>/boot/log.txt
+  fi
+}
+
+
 
 createpostboot(){
   # /var/lib/dietpi/postboot.d/
@@ -362,8 +407,6 @@ if [ -f "$BB_STATE" ]; then
 fi
 
 
-
-# $(</etc/blackbox/)
 
 install(){
 
@@ -471,7 +514,6 @@ install(){
         reboot
     fi
 
-
 }
 
 ######################################
@@ -486,7 +528,22 @@ fi
 ######################################
 
 ######################################
-##           Boot Check             ##
+##         registerdevice           ##
+######################################
+if [ "$1" == "registerdevice" ]; then
+    if [ "$INSTALLSTATE" == "9" ]; then
+        sendhash
+        echo "10" > $BB_STATE
+        INSTALLSTATE=10
+        reboot
+    fi
+fi
+######################################
+
+
+
+######################################
+##            Check             ##
 ######################################
 if [ "$1" == "check" ]; then
     includeSources
@@ -494,6 +551,19 @@ if [ "$1" == "check" ]; then
 
 fi
 ######################################
+
+
+######################################
+##           Boot Check             ##
+######################################
+if [ "$1" == "boot" ]; then
+    includeSources
+    bash /var/lib/dietpi/postboot.d/postboot0.sh
+    sleep 1
+    bash /var/lib/dietpi/postboot.d/postboot1.sh
+fi
+######################################
+
 
 ######################################
 ##           Configure              ##
