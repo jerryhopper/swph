@@ -418,7 +418,7 @@ install(){
     # check installstate, if installstate == 0, copy files.
 
     if [ "$INSTALLSTATE" == "1" ]; then
-        telegram "INSTALLSTATE=$INSTALLSTATE Installing files in /usr/share/blackbox "
+        #telegram "INSTALLSTATE=$INSTALLSTATE Installing files in /usr/share/blackbox "
         cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         #cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         echo "2" > $BB_STATE
@@ -431,8 +431,9 @@ install(){
 
 
 
-    telegram "INSTALLSTATE=$INSTALLSTATE  "
+
     if [ "$INSTALLSTATE" == "2" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE  "
         #cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         echo "3" > $BB_STATE
         INSTALLSTATE=3
@@ -531,7 +532,7 @@ install(){
 
 
         telegram "INSTALLSTATE=$INSTALLSTATE create postboot"
-        
+
         createpostboot
 
         echo "9" > $BB_STATE
