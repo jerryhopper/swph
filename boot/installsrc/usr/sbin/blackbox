@@ -407,7 +407,6 @@ if [ -f "$BB_STATE" ]; then
 fi
 
 
-
 install(){
 
     if [ "$INSTALLSTATE" == "9" ]; then
