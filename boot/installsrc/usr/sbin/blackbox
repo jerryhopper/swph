@@ -505,6 +505,9 @@ install(){
 
         fi
 
+        echo 'server.document-root        = "/var/www/html"'>/etc/lighttpd/external.conf
+        echo 'server.error-handler-404    = "/blackbox/index.php"'>>/etc/lighttpd/external.conf
+
 
 
 
