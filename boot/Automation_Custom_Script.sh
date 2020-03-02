@@ -8,19 +8,16 @@ SCRIPT_FILENAME="Automation_Custom_Script"
 
 echo "Automation_Custom_Script.sh has started">>/boot/log.txt
 
-if [ ! -f "/usr/share/sbin/blackbox" ]; then
-  # no blackbox binary found, installing.
-  # cp -v -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
+if [ ! -f "/usr/sbin/blackbox" ]; then
   ln -s /boot/installsrc/usr/sbin/blackbox /usr/sbin
-  #chmod +x /usr/sbin/blackbox
+  #cp -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
   chmod +x /boot/installsrc/usr/sbin/blackbox
 fi
 
-
 /usr/sbin/blackbox install
 
-echo "Automation_Custom_Script.sh has ended">>/boot/log.txt
 
+echo "Automation_Custom_Script.sh has ended">>/boot/log.txt
 exit 0
 
 
