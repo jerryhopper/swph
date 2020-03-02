@@ -505,8 +505,8 @@ install(){
 
         fi
 
-        echo 'server.document-root        = "/var/www/html"'>/etc/lighttpd/external.conf
-        echo 'server.error-handler-404    = "/blackbox/index.php"'>>/etc/lighttpd/external.conf
+        #echo 'server.document-root        = "/var/www/html"'>/etc/lighttpd/external.conf
+        #echo 'server.error-handler-404    = "/blackbox/index.php"'>>/etc/lighttpd/external.conf
 
 
 
@@ -516,6 +516,7 @@ install(){
 
         #devicelog "[v$VERSION] edit lighttpd "
         sed -i -e 's/pihole\/index.php/blackbox\/index.php/g' /etc/lighttpd/lighttpd.conf
+        sed -i -e 's/\/var\/www/\/var\/www\/html/g' /etc/lighttpd/lighttpd.conf
 
         createpostboot
 
