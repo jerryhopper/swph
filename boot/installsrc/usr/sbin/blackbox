@@ -3,6 +3,20 @@
 set -e
 
 
+# Must be root to use this tool
+if [[ ! $EUID -eq 0 ]];then
+  if [[ -x "$(command -v sudo)" ]]; then
+    exec sudo bash "$0" "$@"
+    exit $?
+  else
+    echo -e "  ${CROSS} sudo is needed to run pihole commands.  Please run this script as root or install sudo."
+    exit 1
+  fi
+fi
+
+
+
+
 
 # Check an IP address to see if it is a valid one
 valid_ip() {
@@ -455,7 +469,7 @@ install(){
     if [ "$INSTALLSTATE" == "4" ]; then
         telegram "INSTALLSTATE=$INSTALLSTATE apt-get install prerequisites"
         # git lighttpd
-        apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof netcat idn2 dns-root-data composer
+        apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof nmap netcat idn2 dns-root-data composer
         echo "5" > $BB_STATE
         INSTALLSTATE=5
     fi
@@ -530,6 +544,7 @@ install(){
         sed -i -e 's/pihole\/index.php/blackbox\/index.php/g' /etc/lighttpd/lighttpd.conf
         sed -i -e 's/"\/var\/www"/"\/var\/www\/html"/g' /etc/lighttpd/lighttpd.conf
 
+        echo "www-data ALL=NOPASSWD: /usr/sbin/blackbox">/etc/sudoers.d/blackbox
 
         telegram "INSTALLSTATE=$INSTALLSTATE create postboot"
 
@@ -593,6 +608,8 @@ if [ "$1" == "update" ]; then
     includeSources
     #make_repo /var/www/html/blackbox
     getGitFiles /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
+    update_repo "/var/www/html/blackbox"
+
 
 fi
 ######################################
