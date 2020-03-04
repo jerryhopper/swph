@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+#set -e
 
 
 # Must be root to use this tool
@@ -13,8 +13,6 @@ if [[ ! $EUID -eq 0 ]];then
     exit 1
   fi
 fi
-
-
 
 
 
@@ -477,9 +475,15 @@ install(){
 
     if [ "$INSTALLSTATE" == "5" ]; then
         telegram "INSTALLSTATE=$INSTALLSTATE Cloning blackbox.git"
-        mkdir -p /var/www/html/blackbox
+        echo "mkdir "
+        if [ ! -d "/var/www/html/blackbox" ]; then
+            mkdir -p /var/www/html/blackbox
+        fi
+        echo "makerepo"
         make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
+        echo "setstate"
         echo "6" > $BB_STATE
+        echo "composer install"
         composer install -d /var/www/html/blackbox
         INSTALLSTATE=6
     fi
@@ -580,6 +584,38 @@ if [ "$1" == "boot" ]; then
     bash /var/lib/dietpi/postboot.d/postboot1.sh
 fi
 ######################################
+
+
+######################################
+##           Network             ##
+######################################
+if [ "$1" == "network" ]; then
+    includeSources
+
+    if [ "$2" == "info" ]; then
+        bash /usr/share/blackbox/networkinfo.sh
+    fi
+    if [ "$2" == "scan" ]; then
+        bash /usr/share/blackbox/networkscan.sh
+    fi
+
+    if [ "$2" == "reset" ]; then
+        echo "network reset"
+        bash /usr/share/blackbox/networkreset.sh
+    fi
+    if [ "$2" == "set" ]; then
+        echo "network set"
+        bash /usr/share/blackbox/networksetstatic.sh $3 $4 $5
+    fi
+
+    if [ "$2" == "current" ]; then
+        echo "network current"
+        bash /usr/share/blackbox/networkcurrent.sh
+    fi
+fi
+######################################
+
+
 
 
 

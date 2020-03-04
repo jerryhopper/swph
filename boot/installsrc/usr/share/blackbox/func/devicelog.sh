@@ -1,9 +1,8 @@
-
 devicelog()
 {
-   local VARIABLE=${1}
+  local VARIABLE=${1}
 
-   if [ -f "$BB_HASHLOCATION" ]; then
+  if [ -f "$BB_HASHLOCATION" ]; then
       local AUTHORIZATION=$(<$BB_HASHLOCATION)
    else
      if [ -f "$TMP_POSTDATAHASH" ]; then
