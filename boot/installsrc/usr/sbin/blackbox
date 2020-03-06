@@ -430,7 +430,7 @@ install(){
 
     if [ "$INSTALLSTATE" == "1" ]; then
         #telegram "INSTALLSTATE=$INSTALLSTATE Installing files in /usr/share/blackbox "
-        cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
+        ln -s /boot/installsrc/usr/share/blackbox /usr/share
         #cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
         echo "2" > $BB_STATE
         INSTALLSTATE=2
@@ -683,6 +683,8 @@ fi
 ######################################
 if [ "$1" == "reset" ]; then
     echo "1">/etc/blackbox/blackbox.state
+    #rm /usr/sbin/blackbox
+    #rm /usr/share/blackbox
 fi
 ######################################
 

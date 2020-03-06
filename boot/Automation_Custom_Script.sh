@@ -13,14 +13,14 @@ if [ -f "/etc/blackbox/blackbox.conf" ]; then
   source "/etc/blackbox/blackbox.conf"
   echo "/etc/blackbox/blackbox.conf exists">>/boot/log.txt
   if [ ! -f "/usr/sbin/blackbox" ]; then
-    if [ "$DEVMODE" == "1"]; then
-      echo "Creating symbolic link /usr/sbin blackbox">>/boot/log.txt
-      ln -s /boot/installsrc/usr/sbin/blackbox /usr/sbin
-      chmod +x /boot/installsrc/usr/sbin/blackbox
-    else
-       echo "Installing /usr/sbin/blackbox">>/boot/log.txt
-       cp -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
-       chmod +x /usr/sbin/blackbox
+    #if [ "$DEVMODE" == "1"]; then
+    echo "Creating symbolic link /usr/sbin blackbox">>/boot/log.txt
+    ln -s /boot/installsrc/usr/sbin/blackbox /usr/sbin
+    chmod +x /boot/installsrc/usr/sbin/blackbox
+    #else
+    #   echo "Installing /usr/sbin/blackbox">>/boot/log.txt
+    #   cp -f /boot/installsrc/usr/sbin/blackbox /usr/sbin
+    #   chmod +x /usr/sbin/blackbox
     fi
 
   fi
