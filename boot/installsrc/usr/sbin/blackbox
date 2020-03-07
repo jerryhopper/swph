@@ -610,16 +610,17 @@ if [ "$1" == "network" ]; then
     fi
 
     if [ "$2" == "reset" ]; then
-        echo "network reset"
+        #echo "network reset"
         bash /usr/share/blackbox/networkreset.sh
     fi
     if [ "$2" == "set" ]; then
-        echo "network set"
+        #echo "network set"
         bash /usr/share/blackbox/networksetstatic.sh $3 $4 $5
+        sleep 1
     fi
 
     if [ "$2" == "current" ]; then
-        echo "network current"
+        #echo "network current"
         bash /usr/share/blackbox/networkcurrent.sh
     fi
 fi
