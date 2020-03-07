@@ -1,9 +1,12 @@
 #!/usr/bin/bash
 
+set -e
 # set network to dhcp
-echo "ok"
-exit 0
+#exit 0
 
+if [ -f /etc/blackbox/.staticip ]; then
+   rm -f /etc/blackbox/.staticip
+fi
 # dhcpd
 
 echo  "# Location: /etc/network/interfaces ">/etc/network/interfaces
@@ -35,4 +38,5 @@ echo  "wireless-power off">>/etc/network/interfaces
 echo  "wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf">>/etc/network/interfaces
 echo  "#dns-nameservers 8.8.8.8 8.8.4.4">>/etc/network/interfaces
 
+echo "ok"
 

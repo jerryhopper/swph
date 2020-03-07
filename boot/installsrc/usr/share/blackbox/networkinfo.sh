@@ -7,7 +7,12 @@ else
 fi
 
 
+PRIM=$(ip addr show eth0|grep "scope global eth0"|awk  '{print $2}')
+SEC=$(ip addr show eth0|grep "scope global secondary noprefixroute eth0"|awk  '{print $2}')
+
+
+
 find_IPv4_information
 
 
-echo "$IPV4_ADDRESS,$IPv4gw"
+echo "$PRIM,$SEC|$IPv4gw"

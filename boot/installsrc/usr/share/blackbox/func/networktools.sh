@@ -1,5 +1,9 @@
 
 
+find_static_IPv4_information(){
+  STATIC_IPV4_ADDRESS=$(ip addr show eth0|grep "scope global eth0"|awk  '{print $2}')
+}
+
 
 find_IPv4_information() {
     # Detects IPv4 address used for communication to WAN addresses.

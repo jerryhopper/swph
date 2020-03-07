@@ -23,7 +23,9 @@ fi
 IP=$1
 SUBNET=$2
 GATEWAY=$3
+SIZE=$4
 
+echo "$IP">/etc/blackbox/.staticip
 #echo "$1 $2 $3"
 
 #exit 0
