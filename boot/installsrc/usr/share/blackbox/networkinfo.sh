@@ -7,8 +7,8 @@ else
 fi
 
 
-PRIM=$(ip addr show eth0|grep "scope global eth0"|awk  '{print $2}')
-SEC=$(ip addr show eth0|grep "scope global secondary noprefixroute eth0"|awk  '{print $2}')
+PRIM=$(ip addr show eth0|grep "scope global"|awk  '{print $2}')
+SEC=$(ip addr show eth0|grep "scope global secondary"|awk  '{print $2}')
 
 
 
