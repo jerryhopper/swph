@@ -519,7 +519,7 @@ install(){
         usermod -a -G pihole www-data
 
         if [ -f "/etc/pihole/ftlbranch" ] ; then
-            if [ "$(</etc/pihole/ftlbranch)" != "release/v5.0" ]; then
+            #if [ "$(</etc/pihole/ftlbranch)" != "release/v5.0" ]; then
 
                 # Set repo to V5 beta
                 echo "release/v5.0" | sudo tee /etc/pihole/ftlbranch
@@ -531,7 +531,7 @@ install(){
                 telegram "INSTALLSTATE=$INSTALLSTATE Checking out release/v5 WEB"
                 #devicelog "[v$VERSION] Checkout release/v5.0 WEB "
                 echo "yes"|pihole checkout web release/v5.0
-            fi
+            #fi
 
         fi
 
