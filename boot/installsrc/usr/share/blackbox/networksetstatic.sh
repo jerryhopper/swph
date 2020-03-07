@@ -3,6 +3,8 @@
 source /usr/share/blackbox/func/valid_ip.sh
 # set ip static
 
+set -e
+
 if  ! valid_ip "$1" ; then
   echo "invalid ip ($1)"
   exit 1
@@ -23,7 +25,7 @@ SUBNET=$2
 GATEWAY=$3
 
 #echo "$1 $2 $3"
-#echo "ok"
+
 #exit 0
 
 echo  "# Location: /etc/network/interfaces ">/etc/network/interfaces
@@ -55,3 +57,4 @@ echo  "wireless-power off">>/etc/network/interfaces
 echo  "wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf">>/etc/network/interfaces
 echo  "#dns-nameservers 8.8.8.8 8.8.4.4">>/etc/network/interfaces
 
+echo "ok"
