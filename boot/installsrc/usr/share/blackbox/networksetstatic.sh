@@ -23,8 +23,8 @@ SUBNET=$2
 GATEWAY=$3
 
 #echo "$1 $2 $3"
-echo "ok"
-exit 0
+#echo "ok"
+#exit 0
 
 echo  "# Location: /etc/network/interfaces ">/etc/network/interfaces
 echo  "# Please modify network settings via: dietpi-config">>/etc/network/interfaces
