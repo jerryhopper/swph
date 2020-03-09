@@ -518,7 +518,7 @@ install(){
         telegram "INSTALLSTATE=$INSTALLSTATE Finalizing installation."
         usermod -a -G pihole www-data
 
-        if [ -f "/etc/pihole/ftlbranch" ] ; then
+        if [ ! -f "/etc/pihole/ftlbranch" ] ; then
             #if [ "$(</etc/pihole/ftlbranch)" != "release/v5.0" ]; then
 
                 # Set repo to V5 beta

@@ -54,8 +54,9 @@ piholesetupvarsconf(){
 }
 
 
-
-
+echo "$IP BlackBox">/etc/pihole/local.list
+echo "$IP pi.hole">>/etc/pihole/local.list
+echo "$IP blackbox.surfwijzer.nl">>/etc/pihole/local.list
 
 echo "$IP">/etc/blackbox/.staticip
 
