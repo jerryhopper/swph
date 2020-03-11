@@ -597,6 +597,18 @@ fi
 
 
 ######################################
+##           Owner                ##
+######################################
+if [ "$1" == "owner" ]; then
+    includeSources
+    if [ "$2" == "set" ]; then
+        #bash /usr/share/blackbox/networkinfo.sh
+        echo "$3">/etc/blackbox/blackbox.owner
+    fi
+fi
+######################################
+
+######################################
 ##           Network             ##
 ######################################
 if [ "$1" == "network" ]; then

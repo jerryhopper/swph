@@ -20,6 +20,8 @@ if  ! valid_ip "$3" ; then
   exit 1
 fi
 
+
+PIHOLE_INTERFACE="eth0"
 IP=$1
 SUBNET=$2
 GATEWAY=$3
@@ -27,6 +29,49 @@ SIZE=$4
 
 
 IPV4_ADDRESS="$1/$4"
+
+
+
+setStaticIPv4() {
+    # Local, named variables
+    local IFCFG_FILE
+    local CONNECTION_NAME
+
+    # If a static interface is already configured, we are done.
+    if [[ -r "/etc/sysconfig/network/ifcfg-${PIHOLE_INTERFACE}" ]]; then
+        if grep -q '^BOOTPROTO=.static.' "/etc/sysconfig/network/ifcfg-${PIHOLE_INTERFACE}"; then
+            return 0
+        fi
+    fi
+    # For the Debian family, if dhcpcd.conf exists,
+    if [[ -f "/etc/dhcpcd.conf" ]]; then
+        # configure networking via dhcpcd
+        setDHCPCD
+        return 0
+    fi
+    # If a DHCPCD config file was not found, check for an ifcfg config file based on interface name
+    if [[ -f "/etc/sysconfig/network-scripts/ifcfg-${PIHOLE_INTERFACE}" ]];then
+        # If it exists,
+        IFCFG_FILE=/etc/sysconfig/network-scripts/ifcfg-${PIHOLE_INTERFACE}
+        setIFCFG "${IFCFG_FILE}"
+        return 0
+    fi
+    # if an ifcfg config does not exists for the interface name, try the connection name via network manager
+    if is_command nmcli && nmcli general status &> /dev/null; then
+        CONNECTION_NAME=$(nmcli dev show "${PIHOLE_INTERFACE}" | grep 'GENERAL.CONNECTION' | cut -d: -f2 | sed 's/^System//' | xargs | tr ' ' '_')
+        if [[ -f "/etc/sysconfig/network-scripts/ifcfg-${CONNECTION_NAME}" ]];then
+            # If it exists,
+            IFCFG_FILE=/etc/sysconfig/network-scripts/ifcfg-${CONNECTION_NAME}
+            setIFCFG "${IFCFG_FILE}"
+            return 0
+        fi
+    fi
+    # If previous conditions failed, show an error and exit
+    printf "  %b Warning: Unable to locate configuration file to set static IPv4 address\\n" "${INFO}"
+    exit 1
+}
+
+
 
 piholesetupvarsconf(){
     echo "PIHOLE_INTERFACE=eth0" >/etc/pihole/setupVars.conf
@@ -97,3 +142,5 @@ echo  "#dns-nameservers 8.8.8.8 8.8.4.4">>/etc/network/interfaces
 
 
 echo "ok"
+
+# $PIHOLE_INTERFACE;
