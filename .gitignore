@@ -1,3 +1,3 @@
 .idea/
-boot/installsrc/usr/lib/php/20180731/swoole.so
-boot/installsrc/usr/include/php/20180731/ext/swoole/config.h
+/boot/installsrc/usr/lib/php/20180731/swoole.so
+/boot/installsrc/usr/include/php/20180731/ext/swoole/config.h
