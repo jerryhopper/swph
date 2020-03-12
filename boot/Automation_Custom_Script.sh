@@ -8,5 +8,5 @@
 
 curl -sSL https://raw.githubusercontent.com/jerryhopper/osbox/master/advanced/installation.sh | bash
 
-osbox install
+#osbox install
 
