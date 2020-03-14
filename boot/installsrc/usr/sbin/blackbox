@@ -1,0 +1,723 @@
+#!/bin/bash
+
+#set -e
+
+
+# Must be root to use this tool
+if [[ ! $EUID -eq 0 ]];then
+  if [[ -x "$(command -v sudo)" ]]; then
+    exec sudo bash "$0" "$@"
+    exit $?
+  else
+    echo -e "  ${CROSS} sudo is needed to run pihole commands.  Please run this script as root or install sudo."
+    exit 1
+  fi
+fi
+
+
+
+# Check an IP address to see if it is a valid one
+valid_ip() {
+    # Local, named variables
+    local ip=${1}
+    local stat=1
+
+    # If the IP matches the format xxx.xxx.xxx.xxx,
+    if [[ "${ip}" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+        # Save the old Internal Field Separator in a variable
+        OIFS=$IFS
+        # and set the new one to a dot (period)
+        IFS='.'
+        # Put the IP into an array
+        ip=(${ip})
+        # Restore the IFS to what it was
+        IFS=${OIFS}
+        ## Evaluate each octet by checking if it's less than or equal to 255 (the max for each octet)
+        [[ "${ip[0]}" -le 255 && "${ip[1]}" -le 255 \
+        && "${ip[2]}" -le 255 && "${ip[3]}" -le 255 ]]
+        # Save the exit code
+        stat=$?
+    fi
+    # Return the exit code
+    return ${stat}
+}
+
+generate_post_data()
+{
+  ### GET DEVICE/SETUP SPECIFIC VALUES ###
+  MID=$(cat /etc/machine-id)
+  MAC=$(ip addr show eth0|grep "ether"|cut -d' ' -f 6)
+  MEMALL=$(cat /proc/meminfo|grep -m 1 "MemTotal"|cut -d' ' -f 2-);
+  MEA=$(echo $MEMALL|cut -d' ' -f 1)
+  MEU=$(echo $MEMALL|cut -d' ' -f 2)
+  SDS=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_SERIAL|cut -d'=' -f 2)
+  FPU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_PART_TABLE_UUID|cut -d'=' -f 2)
+  FSU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep -m 1 ID_FS_UUID|cut -d'=' -f 2)
+  CPH=$(cat /proc/cpuinfo |grep -m 1 "Hardware"|cut -d' ' -f 2)
+  CPI=$(cat /proc/cpuinfo |grep -m 1 "CPU implementer"|cut -d' ' -f 3)
+  CPP=$(cat /proc/cpuinfo |grep -m 1 "Processor"|cut -d' ' -f 2-6)
+  CPA=$(cat /proc/cpuinfo |grep -m 1 "CPU architecture"|cut -d' ' -f 3)
+  CPR=$(cat /proc/cpuinfo |grep -m 1 "CPU revision"|cut -d' ' -f 3)
+  DTE=$(date)
+  cat <<EOF
+{"MID":"$MID","MAC":"$MAC","MEA":"$MEA","MEU":"$MEU","SDS":"$SDS","FPU":"$FPU","FSU":"$FSU","CPH":"$CPH","CPI":"$CPI","CPP":"$CPP","CPA":"$CPA","DTE":"$DTE","CPR":"$CPR"}
+EOF
+}
+
+
+find_IPv4_information() {
+    # Detects IPv4 address used for communication to WAN addresses.
+    # Accepts no arguments, returns no values.
+
+    # Named, local variables
+    local route
+    local IPv4bare
+
+    # Find IP used to route to outside world by checking the the route to Google's public DNS server
+    route=$(ip route get 8.8.8.8)
+
+    # Get just the interface IPv4 address
+    # shellcheck disable=SC2059,SC2086
+    # disabled as we intentionally want to split on whitespace and have printf populate
+    # the variable with just the first field.
+    printf -v IPv4bare "$(printf ${route#*src })"
+    # Get the default gateway IPv4 address (the way to reach the Internet)
+    # shellcheck disable=SC2059,SC2086
+    printf -v IPv4gw "$(printf ${route#*via })"
+
+    if ! valid_ip "${IPv4bare}" ; then
+        IPv4bare="127.0.0.1"
+    fi
+
+    # Append the CIDR notation to the IP address, if valid_ip fails this should return 127.0.0.1/8
+    IPV4_ADDRESS=$(ip -oneline -family inet address show | grep "${IPv4bare}/" |  awk '{print $4}' | awk 'END {print}')
+}
+
+
+piholeadlists(){
+    echo "https://blocklists.surfwijzer.nl/category/porn/$BID">/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/proxy/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/advertising/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/malware/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/suspicious/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group1/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group2/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group3/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group4/$BID">>/etc/pihole/adlists.list
+    echo "https://blocklists.surfwijzer.nl/category/group5/$BID">>/etc/pihole/adlists.list
+}
+
+piholeftlconf(){
+  echo "PRIVACYLEVEL=0" >/etc/pihole/pihole-FTL.conf
+  echo "BLOCKINGMODE=IP-NODATA-AAAA" >>/etc/pihole/pihole-FTL.conf
+
+}
+
+piholesetupvarsconf(){
+    mkdir -p /etc/pihole
+    echo "PIHOLE_INTERFACE=eth0" >/etc/pihole/setupVars.conf
+    #echo "IPV4_ADDRESS=10.0.1.207/24" >>/etc/pihole/setupVars.conf
+    echo "IPV4_ADDRESS=$IPV4_ADDRESS" >>/etc/pihole/setupVars.conf
+    echo "IPV6_ADDRESS=" >>/etc/pihole/setupVars.conf
+    echo "PIHOLE_DNS_1=8.8.8.8" >>/etc/pihole/setupVars.conf
+    echo "PIHOLE_DNS_2=8.8.4.4" >>/etc/pihole/setupVars.conf
+    echo "QUERY_LOGGING=false" >>/etc/pihole/setupVars.conf
+    echo "INSTALL_WEB_SERVER=true" >>/etc/pihole/setupVars.conf
+    echo "INSTALL_WEB_INTERFACE=true" >>/etc/pihole/setupVars.conf
+    echo "LIGHTTPD_ENABLED=true" >>/etc/pihole/setupVars.conf
+    echo "BLOCKING_ENABLED=true" >>/etc/pihole/setupVars.conf
+    echo "DNSMASQ_LISTENING=single" >>/etc/pihole/setupVars.conf
+    echo "DNS_FQDN_REQUIRED=true" >>/etc/pihole/setupVars.conf
+    echo "DNS_BOGUS_PRIV=true" >>/etc/pihole/setupVars.conf
+    #echo "DNSSEC=true" >>/etc/pihole/setupVars.conf
+    echo "TEMPERATUREUNIT=C" >>/etc/pihole/setupVars.conf
+    #echo "CONDITIONAL_FORWARDING=true" >>/etc/pihole/setupVars.conf
+    #echo "CONDITIONAL_FORWARDING_IP=10.0.1.1" >>/etc/pihole/setupVars.conf
+    #echo "CONDITIONAL_FORWARDING_DOMAIN=localdomain" >>/etc/pihole/setupVars.conf
+    #echo "CONDITIONAL_FORWARDING_REVERSE=1.0.10.in-addr.arpa" >>/etc/pihole/setupVars.conf
+    echo "WEBPASSWORD=84ea6bece4df810e8a3d53ba0e6c5ff9cdc5c25ddd2d8b6ad5c5e009015c3e54" >>/etc/pihole/setupVars.conf
+
+}
+
+
+is_command() {
+    # Checks for existence of string passed in as only function argument.
+    # Exit value of 0 when exists, 1 if not exists. Value is the result
+    # of the `command` shell built-in call.
+    local check_command="$1"
+
+    command -v "${check_command}" >/dev/null 2>&1
+}
+
+# A function for checking if a directory is a git repository
+is_repo() {
+    # Use a named, local variable instead of the vague $1, which is the first argument passed to this function
+    # These local variables should always be lowercase
+    local directory="${1}"
+    # A local variable for the current directory
+    local curdir
+    # A variable to store the return code
+    local rc
+    # Assign the current directory variable by using pwd
+    curdir="${PWD}"
+    # If the first argument passed to this function is a directory,
+    if [[ -d "${directory}" ]]; then
+        # move into the directory
+        cd "${directory}"
+        # Use git to check if the directory is a repo
+        # git -C is not used here to support git versions older than 1.8.4
+        git status --short &> /dev/null || rc=$?
+    # If the command was not successful,
+    else
+        # Set a non-zero return code if directory does not exist
+        rc=1
+    fi
+    # Move back into the directory the user started in
+    cd "${curdir}"
+    # Return the code; if one is not set, return 0
+    return "${rc:-0}"
+}
+
+
+# A function to clone a repo
+make_repo() {
+    # Set named variables for better readability
+    local directory="${1}"
+    local remoteRepo="${2}"
+    # The message to display when this function is running
+    str="Clone ${remoteRepo} into ${directory}"
+    # Display the message and use the color table to preface the message with an "info" indicator
+    printf "  %b %s..." "${INFO}" "${str}"
+    # If the directory exists,
+    if [[ -d "${directory}" ]]; then
+        # delete everything in it so git can clone into it
+        rm -rf "${directory}"
+    fi
+    # Clone the repo and return the return code from this command
+    git clone -q --depth 20 "${remoteRepo}" "${directory}" &> /dev/null || return $?
+    # Show a colored message showing it's status
+    printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
+    # Always return 0? Not sure this is correct
+    return 0
+}
+
+# We need to make sure the repos are up-to-date so we can effectively install Clean out the directory if it exists for git to clone into
+update_repo() {
+    # Use named, local variables
+    # As you can see, these are the same variable names used in the last function,
+    # but since they are local, their scope does not go beyond this function
+    # This helps prevent the wrong value from being assigned if you were to set the variable as a GLOBAL one
+    local directory="${1}"
+    local curdir
+
+    # A variable to store the message we want to display;
+    # Again, it's useful to store these in variables in case we need to reuse or change the message;
+    # we only need to make one change here
+    local str="Update repo in ${1}"
+
+    # Make sure we know what directory we are in so we can move back into it
+    curdir="${PWD}"
+    # Move into the directory that was passed as an argument
+    cd "${directory}" &> /dev/null || return 1
+    # Let the user know what's happening
+    printf "  %b %s..." "${INFO}" "${str}"
+    # Stash any local commits as they conflict with our working code
+    git stash --all --quiet &> /dev/null || true # Okay for stash failure
+    git clean --quiet --force -d || true # Okay for already clean directory
+    # Pull the latest commits
+    git pull --quiet &> /dev/null || return $?
+    # Show a completion message
+    printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
+    # Move back into the original directory
+    cd "${curdir}" &> /dev/null || return 1
+    return 0
+}
+
+# A function that combines the functions previously made
+getGitFiles() {
+    # Setup named variables for the git repos
+    # We need the directory
+    local directory="${1}"
+    # as well as the repo URL
+    local remoteRepo="${2}"
+    # A local variable containing the message to be displayed
+    local str="Check for existing repository in ${1}"
+    # Show the message
+    printf "  %b %s..." "${INFO}" "${str}"
+    # Check if the directory is a repository
+    if is_repo "${directory}"; then
+        # Show that we're checking it
+        printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
+        # Update the repo, returning an error message on failure
+        update_repo "${directory}" || { printf "\\n  %b: Could not update local repository. Contact support.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
+    # If it's not a .git repo,
+    else
+        # Show an error
+        printf "%b  %b %s\\n" "${OVER}" "${CROSS}" "${str}"
+        # Attempt to make the repository, showing an error on failure
+        make_repo "${directory}" "${remoteRepo}" || { printf "\\n  %bError: Could not update local repository. Contact support.%b\\n" "${COL_LIGHT_RED}" "${COL_NC}"; exit 1; }
+    fi
+    # echo a blank line
+    echo ""
+    # and return success?
+    return 0
+}
+
+# Reset a repo to get rid of any local changed
+resetRepo() {
+    # Use named variables for arguments
+    local directory="${1}"
+    # Move into the directory
+    cd "${directory}" &> /dev/null || return 1
+    # Store the message in a variable
+    str="Resetting repository within ${1}..."
+    # Show the message
+    printf "  %b %s..." "${INFO}" "${str}"
+    # Use git to remove the local changes
+    git reset --hard &> /dev/null || return $?
+    # And show the status
+    printf "%b  %b %s\\n" "${OVER}" "${TICK}" "${str}"
+    # Returning success anyway?
+    return 0
+}
+includeSources(){
+    source "/usr/share/blackbox/func/devicelog.sh"
+    source "/usr/share/blackbox/func/telegram.sh"
+    source "/usr/share/blackbox/func/valid_ip.sh"
+    source "/usr/share/blackbox/func/find_ip4_information.sh"
+}
+
+
+
+sendhash()
+{
+  # post the hardware data to ur api backend.
+  # we send the hardware-hash as authorization header.
+  #POSTDATA=$(<$TMP_POSTDATA)
+  #HARDWAREHASH=$(<$TMP_POSTDATAHASH)
+
+  status_code=$(curl --write-out %{http_code} --silent --output /dev/null -i \
+  -H "User-Agent: surfwijzerblackbox" \
+  -H "Cache-Control: private, max-age=0, no-cache" \
+  -H "Accept: application/json" \
+  -H "X-Script: 2_registerhardware.sh" \
+  -H "Content-Type:application/json" \
+  -H "Authorization: $BID" \
+  -X POST --data "$(<$BB_JSON)" "https://api.surfwijzer.nl/blackbox/api/installation/$BID/$IPV4_ADDRESS")
+
+  # check if the post succeeds
+  if [[ "$status_code" -eq 200 ]] ; then
+    # unsuccessful attempt.
+    telegram "sendhash Ok (already registered!) : Status = $status_code"
+    #devicelog "sendhash Ok (already registered!) : Status = $status_code ($IPV4_ADDRESS)"
+    echo "sendhash Ok (already registered!)  : Status = $status_code ($IPV4_ADDRESS)" >>/boot/log.txt
+    #echo "sendhash Error : Status = $status_code">>/boot/log.txt
+    #echo "Site status changed to $status_code"
+    #echo "ERRORRRR do not activate."
+
+  elif [[ "$status_code" -eq 201  ]] ;then
+    telegram "sendhash ok : device registered ( $IPV4_ADDRESS) $BID"
+    #devicelog "sendhash ok : device registered ($IPV4_ADDRESS) $BID"
+    echo "sendhash ok : device registered ($IPV4_ADDRESS) $BID" >>/boot/log.txt
+    #createpostboot
+    #echo "5" > $BB_STATE
+    # write the hash for later reference.
+    #mkdir -p /var/www
+    echo  $BID>$BB_HASH
+
+  else
+
+    telegram "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"
+    #devicelog "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"
+    echo "sendhash ERROR  : Status = $status_code ($IPV4_ADDRESS)"  >>/boot/log.txt
+  fi
+}
+
+
+
+createpostboot(){
+  # /var/lib/dietpi/postboot.d/
+  echo "create postboot">>/boot/log.txt
+  #telegram "create postboot START"
+
+  curl  -s -X POST https://api.surfwijzer.nl/blackbox/scripts/postboot0.sh --output /var/lib/dietpi/postboot.d/postboot0.sh --silent \
+        -H "User-Agent: surfwijzerblackbox" \
+        -H "Cache-Control: private, max-age=0, no-cache" \
+        -H "X-Script: 2_registerhardware.sh" \
+        -H "Authorization: $BID" \
+        -e "2_registerhardware.sh" \
+        -d text="2_registerhardware.sh : download postboot0.sh" >/dev/null
+
+  if [[ -f /var/lib/dietpi/postboot.d/postboot0.sh ]] ; then
+      chmod +x /var/lib/dietpi/postboot.d/postboot0.sh
+  fi
+
+  sleep 1
+  curl  -s -X POST https://api.surfwijzer.nl/blackbox/scripts/postboot1.sh --output /var/lib/dietpi/postboot.d/postboot1.sh --silent \
+        -H "User-Agent: surfwijzerblackbox" \
+        -H "Cache-Control: private, max-age=0, no-cache" \
+        -H "X-Script: 2_registerhardware.sh" \
+        -H "Authorization: $BID" \
+        -e "2_registerhardware.sh" \
+        -d text="2_registerhardware.sh : download postboot1.sh" >/dev/null
+
+  if [[ -f /var/lib/dietpi/postboot.d/postboot1.sh ]] ; then
+      chmod +x /var/lib/dietpi/postboot.d/postboot1.sh
+  fi
+  sleep 1
+  echo "create postboot END">>/boot/log.txt
+}
+
+
+
+
+SCRIPT_FILENAME="blackbox"
+INSTALLSTATE=none
+
+
+
+#echo "1=$1 2=$2 3=$3"
+
+if [ "$1" == "" ]; then
+  echo "blackbox"
+  echo "Usage: blackbox [option] "
+  echo "Options : install, configure, check "
+  exit 0
+fi
+
+
+# load blackbox.conf
+if [ -f "/etc/blackbox/blackbox.conf" ]; then
+  source "/etc/blackbox/blackbox.conf"
+  echo "bbstate=$BB_STATE">>/boot/log.txt
+  echo "bbjson=$BB_JSON">>/boot/log.txt
+else
+  echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
+  exit 1
+fi
+
+
+
+if [ -f "$BB_HASH" ]; then
+    BID=$(<$BB_HASH)
+else
+    if [ -f "/etc/blackbox/blackbox.conf" ]; then
+      echo $(generate_post_data)>/etc/blackbox/hardware.json
+      echo $(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)/etc/blackbox/blackbox.id
+      echo "1" > $BB_STATE
+    else
+      echo "0" > $BB_STATE
+      echo "/etc/blackbox/blackbox.conf doesnt exist.">>/boot/log.txt
+    fi
+
+fi
+
+
+# load installlstate in variable
+if [ -f "$BB_STATE" ]; then
+    INSTALLSTATE=$(<$BB_STATE)
+fi
+
+
+install(){
+
+    if [ "$INSTALLSTATE" == "9" ]; then
+        echo "Check completed."
+        exit 0;
+    fi
+
+    # check installstate, if installstate == 0, copy files.
+
+    if [ "$INSTALLSTATE" == "1" ]; then
+        #telegram "INSTALLSTATE=$INSTALLSTATE Installing files in /usr/share/blackbox "
+        ln -s /boot/installsrc/usr/share/blackbox /usr/share
+        #cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
+        echo "2" > $BB_STATE
+        INSTALLSTATE=2
+    fi
+
+    if [ -d /usr/share/blackbox ]; then
+        includeSources
+    fi
+
+
+
+
+    if [ "$INSTALLSTATE" == "2" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE  "
+        #cp -r -v -f /boot/installsrc/usr/share/blackbox /usr/share
+        echo "3" > $BB_STATE
+        INSTALLSTATE=3
+    fi
+
+
+    if [ "$INSTALLSTATE" == "3" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE "
+        #if ! is_command "git"; then
+        #    /boot/dietpi/dietpi-software install 81 17 --unattended
+        #else
+        #echo "4">$BB_STATE
+        echo "4" > $BB_STATE
+        INSTALLSTATE=4
+        #fi
+    fi
+
+
+
+    if [ "$INSTALLSTATE" == "4" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE apt-get install prerequisites"
+        # git lighttpd
+        apt-get -y install php-common php-sqlite3 php-xml php-intl php-zip php-mbstring php-gd php-apcu php-cgi composer dialog dhcpcd5 dnsutils lsof nmap netcat idn2 dns-root-data composer
+        echo "5" > $BB_STATE
+        INSTALLSTATE=5
+    fi
+
+
+    if [ "$INSTALLSTATE" == "5" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Cloning blackbox.git"
+        echo "mkdir "
+        if [ ! -d "/var/www/html/blackbox" ]; then
+            mkdir -p /var/www/html/blackbox
+        fi
+        echo "makerepo"
+        make_repo /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
+        echo "setstate"
+        echo "6" > $BB_STATE
+        echo "composer install"
+        composer install -d /var/www/html/blackbox
+        INSTALLSTATE=6
+    fi
+
+
+    if [ "$INSTALLSTATE" == "6" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Installing Pihole configs and blocklists"
+        find_IPv4_information
+        piholesetupvarsconf
+        piholeftlconf
+        piholeadlists
+        echo "7" > $BB_STATE
+        INSTALLSTATE=7
+    fi
+
+
+    if [ "$INSTALLSTATE" == "7" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Installing Pi-Hole from official repository"
+        echo "install started : pihole">>/boot/log.txt
+        curl -L https://install.pi-hole.net | bash /dev/stdin --unattended
+        #curl -L https://raw.githubusercontent.com/jerryhopper/pi-hole/master/automated%20install/basic-install.sh  | bash /dev/stdin --unattended
+        #curl -L https://github.com/jerryhopper/pi-hole/blob/release/v5.0/automated%20install/basic-install.sh  | bash /dev/stdin --unattended
+
+        #telegram "install finished : pihole"
+        echo "install finished : pihole">>/boot/log.txt
+        echo "8" > $BB_STATE
+        INSTALLSTATE=8
+    fi
+
+
+    if [ "$INSTALLSTATE" == "8" ]; then
+        telegram "INSTALLSTATE=$INSTALLSTATE Finalizing installation."
+        usermod -a -G pihole www-data
+
+        if [ ! -f "/etc/pihole/ftlbranch" ] ; then
+            #if [ "$(</etc/pihole/ftlbranch)" != "release/v5.0" ]; then
+
+                # Set repo to V5 beta
+                echo "release/v5.0" | sudo tee /etc/pihole/ftlbranch
+
+                telegram "INSTALLSTATE=$INSTALLSTATE Checking out release/v5 CORE"
+                #devicelog "[v$VERSION] Checkout release/v5.0 CORE "
+                echo "yes"|pihole checkout core release/v5.0
+
+                telegram "INSTALLSTATE=$INSTALLSTATE Checking out release/v5 WEB"
+                #devicelog "[v$VERSION] Checkout release/v5.0 WEB "
+                echo "yes"|pihole checkout web release/v5.0
+            #fi
+
+        fi
+
+        #echo 'server.document-root        = "/var/www/html"'>/etc/lighttpd/external.conf
+        #echo 'server.error-handler-404    = "/blackbox/index.php"'>>/etc/lighttpd/external.conf
+
+
+
+
+        #devicelog "[v$VERSION] Usermod "
+
+        usermod -a -G pihole www-data
+        #devicelog "[v$VERSION] edit lighttpd "
+        sed -i -e 's/pihole\/index.php/blackbox\/index.php/g' /etc/lighttpd/lighttpd.conf
+        sed -i -e 's/"\/var\/www"/"\/var\/www\/html"/g' /etc/lighttpd/lighttpd.conf
+
+        echo "www-data ALL=NOPASSWD: /usr/sbin/blackbox">/etc/sudoers.d/blackbox
+
+        telegram "INSTALLSTATE=$INSTALLSTATE create postboot"
+
+        createpostboot
+
+        service lighttpd restart
+        echo "9" > $BB_STATE
+        INSTALLSTATE=9
+        telegram "INSTALLSTATE=$INSTALLSTATE"
+        #reboot
+    fi
+
+}
+
+######################################
+##         installation             ##
+######################################
+if [ "$1" == "install" ]; then
+    if [ "$INSTALLSTATE" != "9" ]; then
+        install
+        exit 0;
+    fi
+fi
+######################################
+
+######################################
+##             reboot               ##
+######################################
+if [ "$1" == "reboot" ]; then
+    nohup reboot &
+    exit 0;
+fi
+######################################
+
+
+######################################
+##           Boot Check             ##
+######################################
+if [ "$1" == "boot" ]; then
+    includeSources
+    bash /var/lib/dietpi/postboot.d/postboot0.sh
+    sleep 1
+    bash /var/lib/dietpi/postboot.d/postboot1.sh
+fi
+######################################
+
+
+######################################
+##           Owner                ##
+######################################
+if [ "$1" == "owner" ]; then
+    includeSources
+    if [ "$2" == "set" ]; then
+        #bash /usr/share/blackbox/networkinfo.sh
+        echo "$3">/etc/blackbox/blackbox.owner
+    fi
+fi
+######################################
+
+
+######################################
+##           Network             ##
+######################################
+if [ "$1" == "network" ]; then
+    includeSources
+
+    if [ "$2" == "info" ]; then
+        bash /usr/share/blackbox/networkinfo.sh
+    fi
+    if [ "$2" == "scan" ]; then
+        bash /usr/share/blackbox/networkscan.sh
+    fi
+
+    if [ "$2" == "reset" ]; then
+        #echo "network reset"
+        bash /usr/share/blackbox/networkreset.sh
+    fi
+    if [ "$2" == "set" ]; then
+        #echo "network set"
+        bash /usr/share/blackbox/networksetstatic.sh $3 $4 $5
+        sleep 1
+    fi
+
+    if [ "$2" == "current" ]; then
+        #echo "network current"
+        bash /usr/share/blackbox/networkcurrent.sh
+    fi
+fi
+######################################
+
+
+
+
+
+
+
+######################################
+##         registerdevice           ##
+######################################
+if [ "$1" == "registerdevice" ]; then
+    includeSources
+    if [ "$INSTALLSTATE" == "9" ]; then
+        sendhash
+        echo "10" > $BB_STATE
+        INSTALLSTATE=10
+        telegram "INSTALLSTATE=$INSTALLSTATE"
+        reboot
+    fi
+fi
+######################################
+
+
+######################################
+##           Update!                ##
+######################################
+if [ "$1" == "update" ]; then
+    includeSources
+    #make_repo /var/www/html/blackbox
+    getGitFiles /var/www/html/blackbox https://github.com/jerryhopper/blackboxweb.git
+    update_repo "/var/www/html/blackbox"
+
+
+fi
+######################################
+
+
+
+
+######################################
+##            Check             ##
+######################################
+if [ "$1" == "check" ]; then
+    includeSources
+    echo "INSTALLSTATE=$INSTALLSTATE"
+
+fi
+######################################
+
+
+
+
+
+
+
+######################################
+##           Configure              ##
+######################################
+if [ "$1" == "configure" ]; then
+    includeSources
+    echo "INSTALLSTATE=$INSTALLSTATE"
+fi
+######################################
+
+######################################
+##          Reset bbstate           ##
+######################################
+if [ "$1" == "reset" ]; then
+    echo "1">/etc/blackbox/blackbox.state
+    #rm /usr/sbin/blackbox
+    #rm /usr/share/blackbox
+fi
+######################################
+
+
+
+
+
+
+
+
+
+

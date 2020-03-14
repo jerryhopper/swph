@@ -6,7 +6,8 @@
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
 set -e
-source "/boot/blackbox/blackbox.conf"
+
+source "/etc/blackbox/blackbox.conf"
 
 
 echo "1_hardwaredetect.sh has started">>/boot/log.txt
@@ -21,47 +22,39 @@ echo "1_hardwaredetect.sh has started">>/boot/log.txt
 
 
 
-### GET DEVICE/SETUP SPECIFIC VALUES ###
-MID=$(cat /etc/machine-id)
-MAC=$(ip addr show eth0|grep "ether"|cut -d' ' -f 6)
-MEMALL=$(cat /proc/meminfo|grep -m 1 "MemTotal"|cut -d' ' -f 2-);
-MEA=$(echo $MEMALL|cut -d' ' -f 1)
-MEU=$(echo $MEMALL|cut -d' ' -f 2)
-SDS=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_SERIAL|cut -d'=' -f 2)
-FPU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_PART_TABLE_UUID|cut -d'=' -f 2)
-FSU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep -m 1 ID_FS_UUID|cut -d'=' -f 2)
-CPH=$(cat /proc/cpuinfo |grep -m 1 "Hardware"|cut -d' ' -f 2)
-CPI=$(cat /proc/cpuinfo |grep -m 1 "CPU implementer"|cut -d' ' -f 3)
-CPP=$(cat /proc/cpuinfo |grep -m 1 "Processor"|cut -d' ' -f 2-6)
-CPA=$(cat /proc/cpuinfo |grep -m 1 "CPU architecture"|cut -d' ' -f 3)
-CPR=$(cat /proc/cpuinfo |grep -m 1 "CPU revision"|cut -d' ' -f 3)
-DTE=$(date)
+
 
 
 generate_post_data()
 {
+  ### GET DEVICE/SETUP SPECIFIC VALUES ###
+  MID=$(cat /etc/machine-id)
+  MAC=$(ip addr show eth0|grep "ether"|cut -d' ' -f 6)
+  MEMALL=$(cat /proc/meminfo|grep -m 1 "MemTotal"|cut -d' ' -f 2-);
+  MEA=$(echo $MEMALL|cut -d' ' -f 1)
+  MEU=$(echo $MEMALL|cut -d' ' -f 2)
+  SDS=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_SERIAL|cut -d'=' -f 2)
+  FPU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_PART_TABLE_UUID|cut -d'=' -f 2)
+  FSU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep -m 1 ID_FS_UUID|cut -d'=' -f 2)
+  CPH=$(cat /proc/cpuinfo |grep -m 1 "Hardware"|cut -d' ' -f 2)
+  CPI=$(cat /proc/cpuinfo |grep -m 1 "CPU implementer"|cut -d' ' -f 3)
+  CPP=$(cat /proc/cpuinfo |grep -m 1 "Processor"|cut -d' ' -f 2-6)
+  CPA=$(cat /proc/cpuinfo |grep -m 1 "CPU architecture"|cut -d' ' -f 3)
+  CPR=$(cat /proc/cpuinfo |grep -m 1 "CPU revision"|cut -d' ' -f 3)
+  DTE=$(date)
   cat <<EOF
 {"MID":"$MID","MAC":"$MAC","MEA":"$MEA","MEU":"$MEU","SDS":"$SDS","FPU":"$FPU","FSU":"$FSU","CPH":"$CPH","CPI":"$CPI","CPP":"$CPP","CPA":"$CPA","DTE":"$DTE","CPR":"$CPR"}
 EOF
 }
 
+
+mkdir -p /etc/blackbox/
 ### CREATE JSON ###
 POSTDATA=$(generate_post_data)
-
 ### CREATE HASH OF THE JSON
 HARDWAREHASH=$(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)
 
 
+echo $(generate_post_data)>/etc/blackbox/hardware.json
+echo $(echo -n "$POSTDATA"|openssl dgst -sha256|cut -d' ' -f 2)/etc/blackbox/blackbox.id
 
-
-# here we write the results of the hardwaretests to a file.
-#  /boot/blackbox/hardware.json
-echo  $POSTDATA>$TMP_POSTDATA
-
-#  /boot/blackbox/hardware.hash
-echo  $HARDWAREHASH>$TMP_POSTDATAHASH
-
-
-
-
-echo "1_hardwaredetect.sh has ended">>/boot/log.txt

@@ -65,7 +65,7 @@ AUTO_SETUP_CUSTOM_SCRIPT_EXEC=0
 
 ##### Software Options #####
 # SSH Server Selection: 0=none/custom | -1=Dropbear | -2=OpenSSH
-AUTO_SETUP_SSH_SERVER_INDEX=-1
+AUTO_SETUP_SSH_SERVER_INDEX=-2
 
 # File Server Selection: 0=none/custom | -1=ProFTP | -2=Samba
 AUTO_SETUP_FILE_SERVER_INDEX=0
@@ -106,7 +106,8 @@ AUTO_SETUP_GLOBAL_PASSWORD=dietpi
 # - E.g. the following (without the leading "#") will install the LXDE desktop automatically on first boot:
 # AUTO_SETUP_INSTALL_SOFTWARE_ID=84
 # -AUTO_SETUP_INSTALL_SOFTWARE_ID=93
-
+AUTO_SETUP_INSTALL_SOFTWARE_ID=81
+AUTO_SETUP_INSTALL_SOFTWARE_ID=17
 
 #Automated installs (0 = normal, 1 = dp-core , 2 = grasshopper, 3 = Pi-hole )
 #AUTO_Install_Index=3

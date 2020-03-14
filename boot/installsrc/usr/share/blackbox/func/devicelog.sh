@@ -1,9 +1,8 @@
-
 devicelog()
 {
-   local VARIABLE=${1}
+  local VARIABLE=${1}
 
-   if [ -f "$BB_HASHLOCATION" ]; then
+  if [ -f "$BB_HASHLOCATION" ]; then
       local AUTHORIZATION=$(<$BB_HASHLOCATION)
    else
      if [ -f "$TMP_POSTDATAHASH" ]; then
@@ -14,7 +13,7 @@ devicelog()
    fi
    curl --connect-timeout 5 \
       --max-time 20 \
-      -s -X POST https://blackbox.surfwijzer.nl/api/devicelog \
+      -s -X POST https://api.surfwijzer.nl/blackbox/api/devicelog \
       -H "User-Agent: surfwijzerblackbox" \
       -H "Cache-Control: private, max-age=0, no-cache" \
       -H "Authorization: $AUTHORIZATION" \

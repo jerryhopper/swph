@@ -2,31 +2,37 @@
 # -e option instructs bash to immediately exit if any command [1] has a non-zero exit status
 # We do not want users to end up with a partially working install, so we exit the script
 # instead of continuing the installation with something broken
+
 set -e
-echo "automation_custom_prescript has started">>/boot/log.txt
-
-source "/boot/blackbox/blackbox.conf"
-
-echo "0" > $BB_INSTALLSTATE
 
 
-# Custom Script (pre-networking and pre-DietPi install)
-# - Allows you to automatically execute a custom script before network is up on first boot.
-# - Copy your script to /boot/Automation_Custom_PreScript.sh and it will be executed automatically.
-# - Executed script log: /var/tmp/dietpi/logs/dietpi-automation_custom_prescript.log
+generate_post_data()
+{
+  ### GET DEVICE/SETUP SPECIFIC VALUES ###
+  MID=$(cat /etc/machine-id)
+  MAC=$(ip addr show eth0|grep "ether"|cut -d' ' -f 6)
+  MEMALL=$(cat /proc/meminfo|grep -m 1 "MemTotal"|cut -d' ' -f 2-);
+  MEA=$(echo $MEMALL|cut -d' ' -f 1)
+  MEU=$(echo $MEMALL|cut -d' ' -f 2)
+  SDS=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_SERIAL|cut -d'=' -f 2)
+  FPU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep ID_PART_TABLE_UUID|cut -d'=' -f 2)
+  FSU=$(udevadm info --query=all --name=/dev/mmcblk0p1|grep -m 1 ID_FS_UUID|cut -d'=' -f 2)
+  CPH=$(cat /proc/cpuinfo |grep -m 1 "Hardware"|cut -d' ' -f 2)
+  CPI=$(cat /proc/cpuinfo |grep -m 1 "CPU implementer"|cut -d' ' -f 3)
+  CPP=$(cat /proc/cpuinfo |grep -m 1 "Processor"|cut -d' ' -f 2-6)
+  CPA=$(cat /proc/cpuinfo |grep -m 1 "CPU architecture"|cut -d' ' -f 3)
+  CPR=$(cat /proc/cpuinfo |grep -m 1 "CPU revision"|cut -d' ' -f 3)
+  DTE=$(date)
 
-FILE=/boot/blackbox/1_hardwaredetect.sh
-if [ -f "$FILE" ]; then
-    # run hardware detection and create hardware.json & hardware.hash
-    echo "automation_custom_prescript: running 1_hardwaredetect.sh">>/boot/log.txt
-    bash /boot/blackbox/1_hardwaredetect.sh
-fi
-# delete if devmode is disabled.
-if [[ $DEVMODE = 0 ]]; then
-    # after the hardwaretest, remove the script.
-    echo "automation_custom_prescript: devmode = 0, remove 1_hardwaredetect.sh">>/boot/log.txt
-    rm -f /boot/blackbox/1_hardwaredetect.sh
-fi
+}
 
-echo "automation_custom_prescript has ended">>/boot/log.txt
-echo "1" > $BB_INSTALLSTATE
+#echo "automation_custom_prescript has started">/boot/log.txt
+
+#if [ -f "/etc/osbox/blackbox.conf" ]; then
+#  source "/etc/osbox/blackbox.conf"
+#  POSTDATA='{"MID":"'"$MID"'","MAC":"'"$MAC"'","MEA":"'"$MEA"'","MEU":"'"$MEU"'","SDS":"'"$SDS"'","FPU":"'"$FPU"'","FSU":"'"$FSU"'","CPH":"'"$CPH"'","CPI":"'"$CPI"'","CPP":"'"$CPP"'","CPA":"'"$CPA"'","DTE":"'"$DTE"'","CPR":"'"$CPR"'"}'
+#  echo "$POSTDATA">/etc/blackbox/hardware.json
+#fi
+
+
+#echo "automation_custom_prescript has ended">/boot/log.txt
