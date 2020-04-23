@@ -13,8 +13,6 @@ HWMODEL="NanoPiNEO2-ARMv8"
 GITREPO="https://github.com/jerryhopper/sw-osbox-base.git"
 
 #GITREPO="https://github.com/jerryhopper/swph.git"
-
-
 #GITBRANCH="$HWMODEL"
 GITBRANCH="master"
 
