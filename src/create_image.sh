@@ -10,10 +10,13 @@ cd /home/surfwijzer/domains/blackbox.surfwijzer.nl/public_html/dl
 HWMODEL="NanoPiNEO2-ARMv8"
 
 
+GITREPO="https://github.com/jerryhopper/sw-osbox-base.git"
 
-GITREPO="https://github.com/jerryhopper/swph.git"
-GITBRANCH="$HWMODEL"
+#GITREPO="https://github.com/jerryhopper/swph.git"
 
+
+#GITBRANCH="$HWMODEL"
+GITBRANCH="master"
 
 telegram()
 {
@@ -97,12 +100,12 @@ if [ -d $GITPATH ]; then
     fi
     cd ..
 else
-    echo "Cloning repo" 
-    sudo git clone $GITREPO $GITPATH -b $GITBRANCH 
+    echo "Cloning repo"
+    sudo git clone $GITREPO $GITPATH -b $GITBRANCH
     COMMIT_ID=$(sudo git rev-parse --verify HEAD)
 fi
 
-    
+
 
 
 
@@ -111,7 +114,7 @@ fi
 if [ -d "$MOUNTPATH/etc" ]; then
     try_unmount $MOUNTPATH
 else
-    echo "not mounted."     
+    echo "not mounted."
 fi
 
 
